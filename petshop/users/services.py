@@ -36,3 +36,10 @@ def check_otp_code(*, otp_code: str, email: str | None = None, phone_number: str
 def register(*, email: str, username: str, password: str) -> User:
     user = User.objects.create_user(email=email, username=username, password=password)
     return user
+
+
+def activate_user(user: User) -> User:
+    user.is_active = True
+    user.full_clean()
+    user.save()
+    return user
