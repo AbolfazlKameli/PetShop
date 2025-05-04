@@ -6,3 +6,10 @@ class IsAdminUser(BasePermission):
 
     def has_permission(self, request, view):
         return bool(request.user.is_authenticated and request.user.is_admin)
+
+
+class NotAuthenticatedUser(BasePermission):
+    message = 'You are already authenticated.'
+
+    def has_permission(self, request, view):
+        return not bool(request.user.is_authenticated)
