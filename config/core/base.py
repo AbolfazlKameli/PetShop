@@ -16,7 +16,6 @@ from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-print(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -129,9 +128,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASS': [
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_RENDERER_CLASS': (
         'rest_framework.renderers.JSONRenderer'
-    ],
+    ),
 }
 
 if not DEBUG:
@@ -140,8 +142,10 @@ if not DEBUG:
             'anon': '100/hour',
             'user': '1000/hour'
         },
-        'DEFAULT_THROTTLE_CLASSES': [
+        'DEFAULT_THROTTLE_CLASSES': (
             'rest_framework.throttling.AnonRateThrottle',
             'rest_framework.throttling.UserRateThrottle'
-        ]
+        )
     })
+
+from config.settings.simplejwt import *  # noqa
