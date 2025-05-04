@@ -4,7 +4,8 @@ from rest_framework.response import Response
 
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser
 from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email
-from .serializers import UserSerializer, UserRegisterSerializer, UserVerificationSerializer
+from .serializers import UserSerializer, UserRegisterSerializer, UserVerificationSerializer, \
+    ResendVerificationEmailSerializer
 from .services import register, generate_otp_code, activate_user
 from .tasks import send_email
 
@@ -72,6 +73,42 @@ class UserVerificationAPI(GenericAPIView):
             return Response(
                 data={'data': {'message': 'Account activated successfully.'}},
                 status=status.HTTP_200_OK
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class ResendVerificationEmailAPI(GenericAPIView):
+    serializer_class = ResendVerificationEmailSerializer
+    permission_classes = (NotAuthenticatedUser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = get_user_by_email(serializer.validated_data.get('email'))
+            if user is None:
+                return Response(
+                    data={'data': {'message': 'User with this email not found.'}},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            if user.is_active:
+                return Response(
+                    data={'data': {'message': 'This account already is active'}},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            otp_code = generate_otp_code(email=user.email)
+            content = f'Your verification code: \n{otp_code}'
+            send_email.delay(
+                email=user.email,
+                content=content,
+                subject='PetShop'
+            )
+            return Response(
+                data={'data': {'message': 'We have sent a verification code to your email'}},
+                status=status.HTTP_202_ACCEPTED
             )
         return Response(
             data={'data': {'errors': serializer.errors}},

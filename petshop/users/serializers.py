@@ -52,3 +52,7 @@ class UserVerificationSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError('Entering an email address or phone number is required.')
         return attrs
+
+
+class ResendVerificationEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=50, required=True)
