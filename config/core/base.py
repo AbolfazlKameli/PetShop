@@ -43,11 +43,11 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'drf_spectacular',
     'corsheaders',
-    'django-filters',
+    'django_filters',
 ]
 
 LOCAL_APPS = [
-
+    'petshop.users.apps.UsersConfig'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
