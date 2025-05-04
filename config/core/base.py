@@ -44,6 +44,8 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'corsheaders',
     'django_filters',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist'
 ]
 
 LOCAL_APPS = [
