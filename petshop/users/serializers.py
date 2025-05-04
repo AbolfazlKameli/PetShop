@@ -2,6 +2,8 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from .models import User
+from .services import check_otp_code
+from .validators import validate_iranian_phone_number
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -29,3 +31,24 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         except serializers.ValidationError:
             raise serializers.ValidationError()
         return data
+
+
+class UserVerificationSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=50, required=False)
+    phone_number = serializers.CharField(max_length=11, required=False, validators=[validate_iranian_phone_number])
+    code = serializers.CharField(max_length=5)
+
+    def validate(self, attrs):
+        phone_number = attrs.get('phone_number')
+        email = attrs.get('email')
+        code = attrs.get('code')
+
+        if email:
+            if not check_otp_code(otp_code=code, email=email):
+                raise serializers.ValidationError({'code': 'Code is invalid.'})
+        elif phone_number:
+            if not check_otp_code(otp_code=code, phone_number=phone_number):
+                raise serializers.ValidationError({'code': 'Code is invalid.'})
+        else:
+            raise serializers.ValidationError('Entering an email address or phone number is required.')
+        return attrs
