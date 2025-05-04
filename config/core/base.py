@@ -41,6 +41,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'drf_spectacular'
 ]
 
 LOCAL_APPS = [
@@ -134,6 +135,7 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASS': (
         'rest_framework.renderers.JSONRenderer'
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 if not DEBUG:
@@ -149,3 +151,4 @@ if not DEBUG:
     })
 
 from config.settings.simplejwt import *  # noqa
+from config.settings.spectacular import *  # noqa
