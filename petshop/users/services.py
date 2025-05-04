@@ -18,6 +18,21 @@ def generate_otp_code(*, email: str | None = None, phone_number: str | None = No
             return otp_code
 
 
+def check_otp_code(*, otp_code: str, email: str | None = None, phone_number: str | None = None) -> bool:
+    code: str = ''
+    if email:
+        code = cache.get(f'otp_code_{email}')
+    elif phone_number:
+        code = cache.get(f'otp_code_{phone_number}')
+
+    if code == otp_code:
+        cache.delete(f'otp_code_{email}')
+        cache.delete(f'otp_code_{phone_number}')
+        cache.delete(f'otp_code_{otp_code}')
+        return code == otp_code
+    return False
+
+
 def register(*, email: str, username: str, password: str) -> User:
     user = User.objects.create_user(email=email, username=username, password=password)
     return user
