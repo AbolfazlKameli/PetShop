@@ -154,6 +154,7 @@ if not DEBUG:
     })
 
 from config.settings.smtp_configs import *  # noqa
+from config.settings.s3_storages import *  # noqa
 from config.settings.simplejwt import *  # noqa
 from config.settings.spectacular import *  # noqa
 from config.settings.cors_headers import *  # noqa
