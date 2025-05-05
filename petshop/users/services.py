@@ -60,7 +60,7 @@ def update_user(user: User, data) -> tuple[str, int]:
     email_changed = email and (email != user.email)
     phone_changed = phone_number and (phone_number != user.phone_number)
 
-    for key, value in data:
+    for key, value in data.items():
         setattr(user, key, value)
     message = 'Profile updated successfully.'
 

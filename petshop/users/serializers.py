@@ -9,7 +9,8 @@ from .validators import validate_iranian_phone_number
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        exclude = ('password', 'is_superuser', 'groups', 'user_permissions')
+        exclude = ('password', 'is_superuser', 'groups', 'user_permissions', 'id')
+        read_only_fields = ('last_login', 'role', 'is_active')
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):

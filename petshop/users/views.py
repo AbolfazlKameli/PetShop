@@ -13,8 +13,8 @@ from .serializers import (
     SetPasswordSerializer,
     ResetPasswordSerializer
 )
-from .services import register, generate_otp_code, activate_user, change_user_password
-from .tasks import send_email
+from .services import register, generate_otp_code, activate_user, change_user_password, update_user
+from .tasks import send_email_task, send_sms_task
 
 
 class UsersListAPI(ListAPIView):
@@ -36,7 +36,7 @@ class UserRegisterAPI(GenericAPIView):
             user = register(email=vd['email'], username=vd['username'], password=vd['password'])
             otp_code = generate_otp_code(email=user.email)
             content = f'Your verification code: \n{otp_code}'
-            send_email.delay(
+            send_email_task.delay(
                 email=user.email,
                 content=content,
                 subject='PetShop'
@@ -108,7 +108,7 @@ class ResendVerificationEmailAPI(GenericAPIView):
 
             otp_code = generate_otp_code(email=user.email)
             content = f'Your verification code: \n{otp_code}'
-            send_email.delay(
+            send_email_task.delay(
                 email=user.email,
                 content=content,
                 subject='PetShop'
@@ -180,7 +180,7 @@ class ResetPasswordAPI(GenericAPIView):
                 )
             otp_code = generate_otp_code(email=user.email)
             content = f'Reset password code: \n{otp_code}'
-            send_email.delay(
+            send_email_task.delay(
                 email=user.email,
                 content=content,
                 subject='PetShop'
@@ -210,4 +210,50 @@ class UserProfileRetrieveAPI(GenericAPIView):
         return Response(
             data={'data': serializer.data},
             status=status.HTTP_200_OK
+        )
+
+
+class UserProfileUpdateAPI(GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (IsOwnerUser,)
+
+    def get_object(self):
+        user = get_user_by_id(self.request.user.id)
+        if user is None:
+            return Response(
+                data={'data': {'message': 'User not found.'}},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        self.check_permissions(self.request)
+        self.check_object_permissions(self.request, user)
+        return user
+
+    def put(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.serializer_class(instance=user, data=request.data)
+        if serializer.is_valid():
+            message, state = update_user(user, serializer.validated_data)
+
+            if state == 1:
+                otp_code = generate_otp_code(email=user.email)
+                content = f'Your verification code: \n{otp_code}'
+                send_email_task.delay(
+                    email=user.email,
+                    content=content,
+                    subject='PetShop'
+                )
+
+            elif state == 2:
+                otp_code = generate_otp_code(phone_number=user.phone_number)
+                content = f'Your verification code: \n{otp_code}'
+                send_sms_task.delay(phone_number=user.phone_number, content=content)
+
+            return Response(
+                data={'data': {'message': message}},
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
         )
