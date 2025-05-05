@@ -71,7 +71,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         return data
 
     def validate(self, attrs):
-        password = attrs.get('password')
+        password = attrs.get('new_password')
         confirm_password = attrs.get('confirm_password')
         if password and confirm_password and password != confirm_password:
             raise serializers.ValidationError({'confirm_password': 'Passwords must be match.'})
