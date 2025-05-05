@@ -56,3 +56,25 @@ class UserVerificationSerializer(serializers.Serializer):
 
 class ResendVerificationEmailSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=50, required=True)
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(min_length=8, required=True, write_only=True)
+    new_password = serializers.CharField(min_length=8, required=True, write_only=True)
+    confirm_password = serializers.CharField(min_length=8, required=True, write_only=True)
+
+    def validate_old_password(self, data):
+        user: User = self.context.get('user')
+        if not user.check_password(data):
+            raise serializers.ValidationError('Password is incorrect.')
+        return data
+
+    def validate_confirm_password(self, data):
+        new_password = self.initial_data.get('new_password', False)
+        if new_password and data and new_password != data:
+            raise serializers.ValidationError('Passwords must be match.')
+        try:
+            validate_password(data)
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+        return data
