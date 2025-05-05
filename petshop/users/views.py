@@ -1,7 +1,11 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import ListAPIView, GenericAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 
+from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
 from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email, get_user_by_id
 from .serializers import (
@@ -12,13 +16,25 @@ from .serializers import (
     ChangePasswordSerializer,
     SetPasswordSerializer,
     ResetPasswordSerializer,
-    ResendVerificationSMSSerializer
+    ResendVerificationSMSSerializer,
+    MyTokenObtainPairSerializer
 )
 from .services import register, generate_otp_code, activate_user, change_user_password, update_user
 from .tasks import send_email_task, send_sms_task
 
 
+@extend_schema(responses={200: TokenResponseSerializer})
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    Custom API for obtaining JWT tokens, with a limit of five requests per hour for each IP.
+    """
+    serializer_class = MyTokenObtainPairSerializer
+
+
 class UsersListAPI(ListAPIView):
+    """
+    API for listing all users, accessible only to admin users.
+    """
     queryset = get_all_users()
     serializer_class = UserSerializer
     permission_classes = (IsAdminUser,)
@@ -27,9 +43,13 @@ class UsersListAPI(ListAPIView):
 
 
 class UserRegisterAPI(GenericAPIView):
+    """
+    API for user registration, accessible only to non-authenticated users,
+    """
     serializer_class = UserRegisterSerializer
     permission_classes = (NotAuthenticatedUser,)
 
+    @extend_schema(responses={201: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -53,9 +73,13 @@ class UserRegisterAPI(GenericAPIView):
 
 
 class UserVerificationAPI(GenericAPIView):
+    """
+    API for verifying user registration, accessible only to non-authenticated users,
+    """
     serializer_class = UserVerificationSerializer
     permission_classes = (NotAuthenticatedUser,)
 
+    @extend_schema(responses={200: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -89,9 +113,13 @@ class UserVerificationAPI(GenericAPIView):
 
 
 class ResendVerificationEmailAPI(GenericAPIView):
+    """
+    API for resending a verification email, accessible only to non-authenticated users,
+    """
     serializer_class = ResendVerificationEmailSerializer
     permission_classes = (NotAuthenticatedUser,)
 
+    @extend_schema(responses={202: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -125,9 +153,13 @@ class ResendVerificationEmailAPI(GenericAPIView):
 
 
 class ResendVerificationSMSAPI(GenericAPIView):
+    """
+    API for resending a verification SMS, accessible only to non-authenticated users,
+    """
     serializer_class = ResendVerificationSMSSerializer
     permission_classes = (NotAuthenticatedUser,)
 
+    @extend_schema(responses={202: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -158,9 +190,13 @@ class ResendVerificationSMSAPI(GenericAPIView):
 
 
 class ChangePasswordAPI(GenericAPIView):
+    """
+    API for changing a user's password, accessible only to the user.
+    """
     serializer_class = ChangePasswordSerializer
     permission_classes = (IsOwnerUser,)
 
+    @extend_schema(responses={200: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={'user': request.user})
         if serializer.is_valid():
@@ -176,9 +212,13 @@ class ChangePasswordAPI(GenericAPIView):
 
 
 class SetPasswordAPI(GenericAPIView):
+    """
+    API for setting a user's password during the reset password process, accessible to all users.
+    """
     serializer_class = SetPasswordSerializer
-    permission_classes = (NotAuthenticatedUser,)
+    permission_classes = (AllowAny,)
 
+    @extend_schema(responses={200: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -200,9 +240,13 @@ class SetPasswordAPI(GenericAPIView):
 
 
 class ResetPasswordAPI(GenericAPIView):
+    """
+    API for initiating the password reset process by sending a reset link to the user's email, accessible to all users.
+    """
     serializer_class = ResetPasswordSerializer
-    permission_classes = (NotAuthenticatedUser,)
+    permission_classes = (AllowAny,)
 
+    @extend_schema(responses={202: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -230,6 +274,10 @@ class ResetPasswordAPI(GenericAPIView):
 
 
 class UserProfileRetrieveAPI(GenericAPIView):
+    """
+    API for retrieving the authenticated user's profile information.
+    accessible only to the user themselves.
+    """
     serializer_class = UserSerializer
     permission_classes = (IsOwnerUser,)
 
@@ -248,6 +296,11 @@ class UserProfileRetrieveAPI(GenericAPIView):
 
 
 class UserProfileUpdateAPI(GenericAPIView):
+    """
+    API for updating the authenticated user's profile.
+    Includes support for updating email with re-verification if changed.
+    Accessible to the user themselves.
+    """
     serializer_class = UserSerializer
     permission_classes = (IsOwnerUser,)
 
@@ -263,6 +316,7 @@ class UserProfileUpdateAPI(GenericAPIView):
         self.check_object_permissions(self.request, user)
         return user
 
+    @extend_schema(responses={200: ResponseSerializer})
     def put(self, request, *args, **kwargs):
         user = self.get_object()
         serializer = self.serializer_class(instance=user, data=request.data)
@@ -294,6 +348,9 @@ class UserProfileUpdateAPI(GenericAPIView):
 
 
 class DeleteUserAccountAPI(GenericAPIView):
+    """
+    API for deleting the authenticated user's account. Accessible to the user themselves.
+    """
     permission_classes = (IsOwnerUser,)
     serializer_class = UserSerializer
 

@@ -1,9 +1,32 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import User
 from .services import check_otp_code
 from .validators import validate_iranian_phone_number
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user, lifetime=None):
+        token = super().get_token(user)
+        if lifetime:
+            token.set_exp(claim='exp', lifetime=lifetime)
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
+        data.update({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'user': {
+                'id': self.user.id,
+                'email': self.user.email
+            }
+        })
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):
