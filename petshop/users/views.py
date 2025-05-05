@@ -1,7 +1,10 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 
+from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
 from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email, get_user_by_id
 from .serializers import (
@@ -13,9 +16,19 @@ from .serializers import (
     SetPasswordSerializer,
     ResetPasswordSerializer,
     ResendVerificationSMSSerializer
+    ResendVerificationSMSSerializer,
+    MyTokenObtainPairSerializer
 )
 from .services import register, generate_otp_code, activate_user, change_user_password, update_user
 from .tasks import send_email_task, send_sms_task
+
+
+@extend_schema(responses={200: TokenResponseSerializer})
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    Custom API for obtaining JWT tokens, with a limit of five requests per hour for each IP.
+    """
+    serializer_class = MyTokenObtainPairSerializer
 
 
 class UsersListAPI(ListAPIView):
