@@ -257,3 +257,25 @@ class UserProfileUpdateAPI(GenericAPIView):
             data={'data': {'errors': serializer.errors}},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class DeleteUserAccountAPI(GenericAPIView):
+    permission_classes = (IsOwnerUser,)
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        user = get_user_by_id(self.request.user.id)
+        if user is None:
+            return Response(
+                data={'data': {'message': 'User not found.'}},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        self.check_permissions(self.request)
+        self.check_object_permissions(self.request, user)
+        return user
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

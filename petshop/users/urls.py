@@ -8,6 +8,7 @@ app_name = 'users'
 profile = [
     path('', views.UserProfileRetrieveAPI.as_view(), name='user-profile'),
     path('update/', views.UserProfileUpdateAPI.as_view(), name='user-profile-update'),
+    path('delete/', views.DeleteUserAccountAPI.as_view(), name='user-profile-delete'),
 ]
 
 password = [
