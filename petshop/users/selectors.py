@@ -12,3 +12,7 @@ def get_user_by_phone_number(phone_number: str) -> User:
 
 def get_user_by_email(email: str) -> User:
     return User.objects.filter(email=email).first()
+
+
+def get_user_by_id(user_id: int) -> User:
+    return User.objects.filter(id=user_id).first()

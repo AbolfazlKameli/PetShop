@@ -3,7 +3,7 @@ from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.response import Response
 
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
-from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email
+from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email, get_user_by_id
 from .serializers import (
     UserSerializer,
     UserRegisterSerializer,
@@ -192,4 +192,22 @@ class ResetPasswordAPI(GenericAPIView):
         return Response(
             data={'data': {'errors': serializer.errors}},
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class UserProfileRetrieveAPI(GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (IsOwnerUser,)
+
+    def get(self, request, *args, **kwargs):
+        user = get_user_by_id(user_id=request.user.id)
+        if user is None:
+            return Response(
+                data={'data': {'message': 'User not found.'}},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = self.serializer_class(instance=user)
+        return Response(
+            data={'data': serializer.data},
+            status=status.HTTP_200_OK
         )

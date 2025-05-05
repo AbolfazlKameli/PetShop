@@ -5,6 +5,10 @@ from . import views
 
 app_name = 'users'
 
+profile = [
+    path('', views.UserProfileRetrieveAPI.as_view(), name='user-profile'),
+]
+
 password = [
     path('change/', views.ChangePasswordAPI.as_view(), name='change-password'),
     path('set/', views.SetPasswordAPI.as_view(), name='set-password'),
@@ -19,4 +23,5 @@ urlpatterns = [
     path('verify/', views.UserVerificationAPI.as_view(), name='user-verify'),
     path('resend-verification-email/', views.ResendVerificationEmailAPI.as_view(), name='resend-verification-email'),
     path('password/', include(password)),
+    path('profile/', include(profile)),
 ]
