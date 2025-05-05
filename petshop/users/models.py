@@ -14,7 +14,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         validators=[validate_iranian_phone_number],
         max_length=11,
         unique=True,
-        verbose_name='phone number'
+        verbose_name='phone number',
+        blank=True,
+        null=True
     )
     email = models.EmailField(unique=True, max_length=50, db_index=True)
     role = models.CharField(
@@ -30,7 +32,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'phone_number']
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return f'{self.username} - {self.email}'

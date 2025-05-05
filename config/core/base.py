@@ -44,6 +44,8 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'corsheaders',
     'django_filters',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist'
 ]
 
 LOCAL_APPS = [
@@ -144,14 +146,16 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_RENDERER_CLASS': (
-        'rest_framework.renderers.JSONRenderer'
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter'
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'petshop.utils.pagination.NeatPagination',
+    'PAGE_SIZE': 100
 }
 
 if not DEBUG:
