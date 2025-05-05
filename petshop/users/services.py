@@ -50,3 +50,25 @@ def change_user_password(user: User, password: str) -> User:
     user.full_clean()
     user.save()
     return user
+
+
+def update_user(user: User, data) -> tuple[str, int]:
+    email = data.get('email')
+    phone_number = data.get('phone_number')
+    email_changed = email and (email != user.email)
+    phone_changed = phone_number and (phone_number != user.phone_number)
+
+    for key, value in data:
+        setattr(user, key, value)
+    message = 'Profile updated successfully.'
+
+    if email_changed or phone_changed:
+        user.is_active = False
+        user.save()
+        if email_changed:
+            message += ' activation code sent to your new phone number.'
+        if phone_changed:
+            message += ' activation code sent to you new email address.'
+        return message, 1 if email_changed else 2
+    user.save()
+    return message, 0
