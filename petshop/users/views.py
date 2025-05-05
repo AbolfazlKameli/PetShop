@@ -11,7 +11,8 @@ from .serializers import (
     ResendVerificationEmailSerializer,
     ChangePasswordSerializer,
     SetPasswordSerializer,
-    ResetPasswordSerializer
+    ResetPasswordSerializer,
+    ResendVerificationSMSSerializer
 )
 from .services import register, generate_otp_code, activate_user, change_user_password, update_user
 from .tasks import send_email_task, send_sms_task
@@ -115,6 +116,39 @@ class ResendVerificationEmailAPI(GenericAPIView):
             )
             return Response(
                 data={'data': {'message': 'We have sent a verification code to your email'}},
+                status=status.HTTP_202_ACCEPTED
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class ResendVerificationSMSAPI(GenericAPIView):
+    serializer_class = ResendVerificationSMSSerializer
+    permission_classes = (NotAuthenticatedUser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            phone_number = serializer.validated_data.get('phone_number')
+            user = get_user_by_phone_number(phone_number=phone_number)
+            if user is None:
+                return Response(
+                    data={'data': {'message': 'User with this phone numer not found'}},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            if user.is_active:
+                return Response(
+                    data={'data': {'message': 'This account already is active'}},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            otp_code = generate_otp_code(phone_number=user.phone_number)
+            content = f'Your verification code: \n{otp_code}'
+            send_sms_task.delay(phone_number=phone_number, content=content)
+            return Response(
+                data={'data': {'message': 'We have sent you a verification code to your phone number.'}},
                 status=status.HTTP_202_ACCEPTED
             )
         return Response(

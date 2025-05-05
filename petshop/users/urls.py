@@ -24,6 +24,7 @@ urlpatterns = [
     path('register/', views.UserRegisterAPI.as_view(), name='user-register'),
     path('verify/', views.UserVerificationAPI.as_view(), name='user-verify'),
     path('resend-verification-email/', views.ResendVerificationEmailAPI.as_view(), name='resend-verification-email'),
+    path('resend-verification-sms/', views.ResendVerificationSMSAPI.as_view(), name='resend-verification-sms'),
     path('password/', include(password)),
     path('profile/', include(profile)),
 ]

@@ -60,6 +60,10 @@ class ResendVerificationEmailSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=50, required=True)
 
 
+class ResendVerificationSMSSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=11, required=True, validators=[validate_iranian_phone_number])
+
+
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(min_length=8, required=True, write_only=True)
     new_password = serializers.CharField(min_length=8, required=True, write_only=True)
