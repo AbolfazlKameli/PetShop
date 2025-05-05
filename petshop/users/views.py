@@ -4,8 +4,15 @@ from rest_framework.response import Response
 
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
 from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email
-from .serializers import UserSerializer, UserRegisterSerializer, UserVerificationSerializer, \
-    ResendVerificationEmailSerializer, ChangePasswordSerializer, SetPasswordSerializer, ResetPasswordSerializer
+from .serializers import (
+    UserSerializer,
+    UserRegisterSerializer,
+    UserVerificationSerializer,
+    ResendVerificationEmailSerializer,
+    ChangePasswordSerializer,
+    SetPasswordSerializer,
+    ResetPasswordSerializer
+)
 from .services import register, generate_otp_code, activate_user, change_user_password
 from .tasks import send_email
 

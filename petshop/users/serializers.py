@@ -22,15 +22,16 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             'password': {'write_only': True, 'min_length': 8}
         }
 
-    def validate_confirm_password(self, data):
-        password1 = self.initial_data.get('password', False)
-        if password1 and data and password1 != data:
-            raise serializers.ValidationError('Passwords must be match.')
+    def validate(self, attrs):
+        password = attrs.get('password')
+        confirm_password = attrs.get('confirm_password')
+        if password and confirm_password and password != confirm_password:
+            raise serializers.ValidationError({'confirm_password': 'Passwords must be match.'})
         try:
-            validate_password(data)
+            validate_password(confirm_password)
         except serializers.ValidationError as e:
             raise serializers.ValidationError(e.messages)
-        return data
+        return attrs
 
 
 class UserVerificationSerializer(serializers.Serializer):
@@ -69,15 +70,16 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError('Password is incorrect.')
         return data
 
-    def validate_confirm_password(self, data):
-        new_password = self.initial_data.get('new_password', False)
-        if new_password and data and new_password != data:
-            raise serializers.ValidationError('Passwords must be match.')
+    def validate(self, attrs):
+        password = attrs.get('password')
+        confirm_password = attrs.get('confirm_password')
+        if password and confirm_password and password != confirm_password:
+            raise serializers.ValidationError({'confirm_password': 'Passwords must be match.'})
         try:
-            validate_password(data)
+            validate_password(confirm_password)
         except serializers.ValidationError as e:
             raise serializers.ValidationError(e.messages)
-        return data
+        return attrs
 
 
 class SetPasswordSerializer(serializers.Serializer):
@@ -90,7 +92,7 @@ class SetPasswordSerializer(serializers.Serializer):
         new_password = attrs.get('new_password')
         confirm_password = attrs.get('confirm_password')
         if new_password and confirm_password and new_password != confirm_password:
-            raise serializers.ValidationError('Passwords must be match.')
+            raise serializers.ValidationError({'confirm_password': 'Passwords must be match.'})
         try:
             validate_password(confirm_password)
         except serializers.ValidationError as e:
