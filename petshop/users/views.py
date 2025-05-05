@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
 from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email
 from .serializers import UserSerializer, UserRegisterSerializer, UserVerificationSerializer, \
-    ResendVerificationEmailSerializer, ChangePasswordSerializer
+    ResendVerificationEmailSerializer, ChangePasswordSerializer, SetPasswordSerializer
 from .services import register, generate_otp_code, activate_user, change_user_password
 from .tasks import send_email
 
@@ -126,6 +126,25 @@ class ChangePasswordAPI(GenericAPIView):
             change_user_password(user=request.user, password=serializer.validated_data.get('confirm_password'))
             return Response(
                 data={'data': {'message': 'Your password changed successfully.'}},
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class SetPasswordAPI(GenericAPIView):
+    serializer_class = SetPasswordSerializer
+    permission_classes = (NotAuthenticatedUser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = get_user_by_email(serializer.validated_data.get('email'))
+            change_user_password(user, serializer.validated_data.get('confirm_password'))
+            return Response(
+                data={'data': {'message': 'Password Set successfully.'}},
                 status=status.HTTP_200_OK
             )
         return Response(

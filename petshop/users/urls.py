@@ -7,6 +7,7 @@ app_name = 'users'
 
 password = [
     path('change/', views.ChangePasswordAPI.as_view(), name='change-password'),
+    path('set/', views.SetPasswordAPI.as_view(), name='set-password'),
 ]
 
 urlpatterns = [

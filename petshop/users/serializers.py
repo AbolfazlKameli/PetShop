@@ -28,8 +28,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Passwords must be match.')
         try:
             validate_password(data)
-        except serializers.ValidationError:
-            raise serializers.ValidationError()
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError(e.messages)
         return data
 
 
@@ -78,3 +78,26 @@ class ChangePasswordSerializer(serializers.Serializer):
         except serializers.ValidationError as e:
             raise serializers.ValidationError(e.messages)
         return data
+
+
+class SetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=50, required=True)
+    code = serializers.CharField(max_length=5, required=True)
+    new_password = serializers.CharField(min_length=8, required=True, write_only=True)
+    confirm_password = serializers.CharField(min_length=8, required=True, write_only=True)
+
+    def validate(self, attrs):
+        new_password = attrs.get('new_password')
+        confirm_password = attrs.get('confirm_password')
+        if new_password and confirm_password and new_password != confirm_password:
+            raise serializers.ValidationError('Passwords must be match.')
+        try:
+            validate_password(confirm_password)
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+
+        email = attrs.get('email')
+        code = attrs.get('code')
+        if not check_otp_code(otp_code=code, email=email):
+            raise serializers.ValidationError({'code': 'Code is invalid.'})
+        return attrs
