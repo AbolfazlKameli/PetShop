@@ -1,6 +1,8 @@
 from random import randint
 
+from decouple import config
 from django.core.cache import cache
+from kavenegar import KavenegarAPI, HTTPException, APIException
 
 from .models import User
 
@@ -72,3 +74,16 @@ def update_user(user: User, data) -> tuple[str, int]:
         return message, 1 if email_changed else 2
     user.save()
     return message, 0
+
+
+def send_sms(*, phone_number: str, content: str):
+    api = KavenegarAPI(config('KAVENEGAR_API_KEY'))
+    sender = config('KAVENEGAR_PHONE_NUMBER', default='2000500666')
+    params = {'sender': sender, 'receptor': phone_number, 'message': content}
+    try:
+        response = api.sms_send(params)
+    except APIException:
+        return False
+    except HTTPException:
+        return False
+    return response
