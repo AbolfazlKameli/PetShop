@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
 from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email
 from .serializers import UserSerializer, UserRegisterSerializer, UserVerificationSerializer, \
-    ResendVerificationEmailSerializer, ChangePasswordSerializer, SetPasswordSerializer
+    ResendVerificationEmailSerializer, ChangePasswordSerializer, SetPasswordSerializer, ResetPasswordSerializer
 from .services import register, generate_otp_code, activate_user, change_user_password
 from .tasks import send_email
 
@@ -142,10 +142,45 @@ class SetPasswordAPI(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             user = get_user_by_email(serializer.validated_data.get('email'))
+            if user is None:
+                return Response(
+                    data={'data': {'message': 'User with this email not found.'}},
+                    status=status.HTTP_404_NOT_FOUND
+                )
             change_user_password(user, serializer.validated_data.get('confirm_password'))
             return Response(
                 data={'data': {'message': 'Password Set successfully.'}},
                 status=status.HTTP_200_OK
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class ResetPasswordAPI(GenericAPIView):
+    serializer_class = ResetPasswordSerializer
+    permission_classes = (NotAuthenticatedUser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            user = get_user_by_email(serializer.validated_data.get('email'))
+            if user is None:
+                return Response(
+                    data={'data': {'message': 'User with this email not found.'}},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            otp_code = generate_otp_code(email=user.email)
+            content = f'Reset password code: \n{otp_code}'
+            send_email.delay(
+                email=user.email,
+                content=content,
+                subject='PetShop'
+            )
+            return Response(
+                data={'data': {'message': 'We have sent a verification code to your email'}},
+                status=status.HTTP_202_ACCEPTED
             )
         return Response(
             data={'data': {'errors': serializer.errors}},

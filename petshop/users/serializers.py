@@ -101,3 +101,7 @@ class SetPasswordSerializer(serializers.Serializer):
         if not check_otp_code(otp_code=code, email=email):
             raise serializers.ValidationError({'code': 'Code is invalid.'})
         return attrs
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=50, required=True)
