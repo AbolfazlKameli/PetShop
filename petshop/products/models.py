@@ -65,3 +65,9 @@ class Product(BaseModel):
 
     class Meta:
         ordering = ('-updated_date',)
+
+
+class ProductDetail(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='details')
+    key = models.CharField(max_length=250)
+    value = models.CharField(max_length=250)
