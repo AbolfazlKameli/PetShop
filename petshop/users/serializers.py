@@ -2,7 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import User
+from .models import User, Address
 from .services import check_otp_code
 from .validators import validate_iranian_phone_number
 
@@ -29,7 +29,15 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        exclude = ('owner', 'id')
+
+
 class UserSerializer(serializers.ModelSerializer):
+    address = AddressSerializer(many=True, read_only=True)
+
     class Meta:
         model = User
         exclude = ('password', 'is_superuser', 'groups', 'user_permissions', 'id')
