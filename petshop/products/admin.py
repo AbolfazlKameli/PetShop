@@ -1,10 +1,14 @@
 from django.contrib import admin
 
-from .models import ProductCategory, Product, ProductDetail
+from .models import ProductCategory, Product, ProductDetail, ProductImage
 
 
 class ProductDetailInline(admin.TabularInline):
     model = ProductDetail
+
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
 
 
 @admin.register(ProductCategory)
@@ -20,7 +24,7 @@ class ProductModelAdmin(admin.ModelAdmin):
     list_display = ('title', 'quantity', 'available', 'final_price', 'discount_percent')
     list_filter = ('available',)
     search_fields = ('title', 'description')
-    inlines = (ProductDetailInline,)
+    inlines = (ProductDetailInline, ProductImageInline)
 
 
 @admin.register(ProductDetail)

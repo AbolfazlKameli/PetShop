@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, FileExtensionValidator
 from django.db import models
 from django.utils.text import slugify
 
@@ -71,3 +71,8 @@ class ProductDetail(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='details')
     key = models.CharField(max_length=250)
     value = models.CharField(max_length=250)
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])])
