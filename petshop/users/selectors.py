@@ -20,3 +20,7 @@ def get_user_by_id(user_id: int) -> User:
 
 def get_all_addresses() -> list[Address]:
     return Address.objects.select_related('owner').all()
+
+
+def get_user_addresses(owner: User) -> list[Address]:
+    return Address.objects.filter(owner=owner)

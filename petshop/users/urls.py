@@ -9,6 +9,7 @@ profile = [
     path('', views.UserProfileRetrieveAPI.as_view(), name='user-profile'),
     path('update/', views.UserProfileUpdateAPI.as_view(), name='user-profile-update'),
     path('delete/', views.DeleteUserAccountAPI.as_view(), name='user-profile-delete'),
+    path('addresses/', views.UserAddressesListAPI.as_view(), name='user-addresses-list'),
 ]
 
 password = [

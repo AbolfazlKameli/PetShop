@@ -7,7 +7,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
-from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email, get_user_by_id, get_all_addresses
+from .selectors import (
+    get_all_users,
+    get_user_by_phone_number,
+    get_user_by_email,
+    get_user_by_id,
+    get_all_addresses,
+    get_user_addresses
+)
 from .serializers import (
     UserSerializer,
     UserRegisterSerializer,
@@ -371,6 +378,15 @@ class DeleteUserAccountAPI(GenericAPIView):
         user = self.get_object()
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserAddressesListAPI(ListAPIView):
+    serializer_class = AddressSerializer
+    permission_classes = (IsOwnerUser,)
+    search_fields = ('address', 'postal_code')
+
+    def get_queryset(self):
+        return get_user_addresses(owner=self.request.user)
 
 
 class AddressCreateAPI(GenericAPIView):
