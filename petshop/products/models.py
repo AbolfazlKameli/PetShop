@@ -25,7 +25,7 @@ class Product(BaseModel):
     title = models.CharField(max_length=70)
     slug = models.SlugField(max_length=100, allow_unicode=True, db_index=True)
     quantity = models.PositiveSmallIntegerField(
-        validators=[MaxValueValidator(1000), MinValueValidator(1)],
+        validators=[MaxValueValidator(1000)],
         db_index=True
     )
     description = models.TextField()
@@ -33,7 +33,7 @@ class Product(BaseModel):
     unit_price = models.DecimalField(
         decimal_places=0,
         max_digits=15,
-        validators=[MinValueValidator(10_000)],
+        validators=[MinValueValidator(1_000)],
         db_index=True
     )
     discount_percent = models.PositiveSmallIntegerField(
@@ -44,7 +44,7 @@ class Product(BaseModel):
     final_price = models.DecimalField(
         decimal_places=0,
         max_digits=15,
-        validators=[MinValueValidator(10_000)],
+        validators=[MinValueValidator(1_000)],
         default=0,
         db_index=True
     )
@@ -52,7 +52,7 @@ class Product(BaseModel):
     def get_final_price(self):
         if self.discount_percent > 0:
             discount_amount = self.unit_price * Decimal(self.discount_percent / 100)
-            discounted_amount = self.unit_price = discount_amount
+            discounted_amount = self.unit_price - discount_amount
             return round(discounted_amount)
         else:
             return round(self.unit_price)
@@ -60,4 +60,5 @@ class Product(BaseModel):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)
         self.final_price = self.get_final_price()
+        self.available = True if self.quantity > 0 else False
         super().save(*args, **kwargs)
