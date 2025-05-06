@@ -419,7 +419,7 @@ class AddressCreateAPI(GenericAPIView):
 
 class AddressUpdateAPI(GenericAPIView):
     """
-    API for creating addresses for the authenticated user. Accessible only to the user themselves.
+    API for updating addresses for the authenticated user. Accessible only to the user themselves.
     """
     serializer_class = AddressSerializer
     permission_classes = (IsOwnerUser,)
