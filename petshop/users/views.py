@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
-from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email, get_user_by_id
+from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email, get_user_by_id, get_all_addresses
 from .serializers import (
     UserSerializer,
     UserRegisterSerializer,
@@ -384,6 +384,27 @@ class AddressCreateAPI(GenericAPIView):
             return Response(
                 data={'data': {'message': 'address created successfully.'}},
                 status=status.HTTP_201_CREATED
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class AddressUpdateAPI(GenericAPIView):
+    serializer_class = AddressSerializer
+    permission_classes = (IsOwnerUser,)
+    lookup_url_kwarg = 'address_id'
+    queryset = get_all_addresses()
+
+    def put(self, request, *args, **kwargs):
+        address = self.get_object()
+        serializer = self.serializer_class(data=request.data, instance=address)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                data={'data': {'message': 'address updated successfully.'}},
+                status=status.HTTP_200_OK
             )
         return Response(
             data={'data': {'errors': serializer.errors}},
