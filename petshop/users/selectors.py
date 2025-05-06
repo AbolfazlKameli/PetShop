@@ -1,4 +1,4 @@
-from .models import User
+from .models import User, Address
 
 
 def get_all_users() -> list[User]:
@@ -15,4 +15,12 @@ def get_user_by_email(email: str) -> User:
 
 
 def get_user_by_id(user_id: int) -> User:
-    return User.objects.filter(id=user_id).first()
+    return User.objects.filter(id=user_id).prefetch_related('address').first()
+
+
+def get_all_addresses() -> list[Address]:
+    return Address.objects.select_related('owner').all()
+
+
+def get_user_addresses(owner: User) -> list[Address]:
+    return Address.objects.filter(owner=owner)

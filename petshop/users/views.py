@@ -1,13 +1,21 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import ListAPIView, GenericAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
-from .selectors import get_all_users, get_user_by_phone_number, get_user_by_email, get_user_by_id
+from .models import Address
+from .selectors import (
+    get_all_users,
+    get_user_by_phone_number,
+    get_user_by_email,
+    get_user_by_id,
+    get_all_addresses,
+    get_user_addresses
+)
 from .serializers import (
     UserSerializer,
     UserRegisterSerializer,
@@ -17,7 +25,8 @@ from .serializers import (
     SetPasswordSerializer,
     ResetPasswordSerializer,
     ResendVerificationSMSSerializer,
-    MyTokenObtainPairSerializer
+    MyTokenObtainPairSerializer,
+    AddressSerializer
 )
 from .services import register, generate_otp_code, activate_user, change_user_password, update_user
 from .tasks import send_email_task, send_sms_task
@@ -370,3 +379,81 @@ class DeleteUserAccountAPI(GenericAPIView):
         user = self.get_object()
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserAddressesListAPI(ListAPIView):
+    """
+    API for listing authenticated users addresses. Accessible only to the uesr themselves.
+    """
+    serializer_class = AddressSerializer
+    permission_classes = (IsOwnerUser,)
+    search_fields = ('address', 'postal_code')
+
+    def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Address.objects.none()
+        return get_user_addresses(owner=self.request.user)
+
+
+class AddressCreateAPI(GenericAPIView):
+    """
+    API for creating addresses for the authenticated user. Accessible only to the user themselves.
+    """
+    serializer_class = AddressSerializer
+    permission_classes = (IsAuthenticated,)
+
+    @extend_schema(responses={201: ResponseSerializer})
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            return Response(
+                data={'data': {'message': 'address created successfully.'}},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class AddressUpdateAPI(GenericAPIView):
+    """
+    API for creating addresses for the authenticated user. Accessible only to the user themselves.
+    """
+    serializer_class = AddressSerializer
+    permission_classes = (IsOwnerUser,)
+    lookup_url_kwarg = 'address_id'
+    queryset = get_all_addresses()
+
+    @extend_schema(responses={200: ResponseSerializer})
+    def put(self, request, *args, **kwargs):
+        address = self.get_object()
+        serializer = self.serializer_class(data=request.data, instance=address)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                data={'data': {'message': 'address updated successfully.'}},
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class AddressDeleteAPI(GenericAPIView):
+    """
+    API for deleting addresses for the authenticated user. Accessible only to the user themselves.
+    """
+    serializer_class = AddressSerializer
+    permission_classes = (IsOwnerUser,)
+    lookup_url_kwarg = 'address_id'
+    queryset = get_all_addresses()
+
+    def delete(self, request, *args, **kwargs):
+        address = self.get_object()
+        address.delete()
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )

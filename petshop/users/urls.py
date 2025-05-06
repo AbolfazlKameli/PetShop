@@ -9,12 +9,19 @@ profile = [
     path('', views.UserProfileRetrieveAPI.as_view(), name='user-profile'),
     path('update/', views.UserProfileUpdateAPI.as_view(), name='user-profile-update'),
     path('delete/', views.DeleteUserAccountAPI.as_view(), name='user-profile-delete'),
+    path('addresses/', views.UserAddressesListAPI.as_view(), name='user-addresses-list'),
 ]
 
 password = [
     path('change/', views.ChangePasswordAPI.as_view(), name='change-password'),
     path('set/', views.SetPasswordAPI.as_view(), name='set-password'),
     path('reset/', views.ResetPasswordAPI.as_view(), name='reset-password'),
+]
+
+addresses = [
+    path('create/', views.AddressCreateAPI.as_view(), name='address-create'),
+    path('<int:address_id>/update/', views.AddressUpdateAPI.as_view(), name='address-update'),
+    path('<int:address_id>/delete/', views.AddressDeleteAPI.as_view(), name='address-delete'),
 ]
 
 urlpatterns = [
@@ -27,4 +34,5 @@ urlpatterns = [
     path('resend-verification-sms/', views.ResendVerificationSMSAPI.as_view(), name='resend-verification-sms'),
     path('password/', include(password)),
     path('profile/', include(profile)),
+    path('addresses/', include(addresses)),
 ]

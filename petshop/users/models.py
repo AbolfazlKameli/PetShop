@@ -1,9 +1,10 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
+from petshop.utils.utils import BaseModel
 from . import choices
 from .managers import UserManager
-from .validators import validate_iranian_phone_number
+from .validators import validate_iranian_phone_number, validate_postal_code
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -51,3 +52,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         ordering = ('-created_date',)
+
+
+class Address(BaseModel):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='address')
+    address = models.TextField()
+    postal_code = models.CharField(
+        verbose_name='postal code',
+        max_length=10,
+        validators=[validate_postal_code]
+    )
+
+    def __str__(self):
+        return f'{self.owner} - {self.postal_code}'
+
+    class Meta:
+        ordering = ('-created_date',)
+        verbose_name_plural = 'Addresses'
