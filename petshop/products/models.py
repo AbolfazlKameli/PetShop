@@ -62,3 +62,6 @@ class Product(BaseModel):
         self.final_price = self.get_final_price()
         self.available = True if self.quantity > 0 else False
         super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ('-updated_date',)

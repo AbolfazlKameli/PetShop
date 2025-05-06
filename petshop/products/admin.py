@@ -11,4 +11,8 @@ class ProductCategoryModelAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
 
 
-admin.site.register(Product)
+@admin.register(Product)
+class ProductModelAdmin(admin.ModelAdmin):
+    list_display = ('title', 'quantity', 'available', 'final_price', 'discount_percent')
+    list_filter = ('available',)
+    search_fields = ('title', 'description')
