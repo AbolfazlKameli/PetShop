@@ -410,3 +410,17 @@ class AddressUpdateAPI(GenericAPIView):
             data={'data': {'errors': serializer.errors}},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class AddressDeleteAPI(GenericAPIView):
+    serializer_class = AddressSerializer
+    permission_classes = (IsOwnerUser,)
+    lookup_url_kwarg = 'address_id'
+    queryset = get_all_addresses()
+
+    def delete(self, request, *args, **kwargs):
+        address = self.get_object()
+        address.delete()
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )

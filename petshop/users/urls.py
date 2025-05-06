@@ -20,6 +20,7 @@ password = [
 addresses = [
     path('create/', views.AddressCreateAPI.as_view(), name='address-create'),
     path('<int:address_id>/update/', views.AddressUpdateAPI.as_view(), name='address-update'),
+    path('<int:address_id>/delete/', views.AddressDeleteAPI.as_view(), name='address-delete'),
 ]
 
 urlpatterns = [
