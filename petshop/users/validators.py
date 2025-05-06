@@ -14,4 +14,4 @@ def validate_postal_code(value: str):
     pattern = '^\\d{10}$'
 
     if not re.match(pattern, value):
-        raise ValidationError('یک کد پستی معتبر وارد کنید.')
+        raise ValidationError('Enter a valid iranian postal code.')

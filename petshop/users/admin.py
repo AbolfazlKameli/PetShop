@@ -1,8 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User
 from .forms import UserCreationForm, UserChangeForm
+from .models import User, Address
+
+
+class AddressInline(admin.StackedInline):
+    model = Address
 
 
 class UserModelAdmin(BaseUserAdmin):
@@ -35,6 +39,7 @@ class UserModelAdmin(BaseUserAdmin):
 
     search_fields = ('email', 'username', 'phone_number')
     ordering = ('-created_date',)
+    inlines = (AddressInline,)
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -45,3 +50,9 @@ class UserModelAdmin(BaseUserAdmin):
 
 
 admin.site.register(User, UserModelAdmin)
+
+
+@admin.register(Address)
+class AddressModelAdmin(admin.ModelAdmin):
+    list_display = ('owner__email', 'postal_code')
+    search_fields = ('address',)
