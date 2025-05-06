@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import ListAPIView, GenericAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -17,7 +17,8 @@ from .serializers import (
     SetPasswordSerializer,
     ResetPasswordSerializer,
     ResendVerificationSMSSerializer,
-    MyTokenObtainPairSerializer
+    MyTokenObtainPairSerializer,
+    AddressSerializer
 )
 from .services import register, generate_otp_code, activate_user, change_user_password, update_user
 from .tasks import send_email_task, send_sms_task
@@ -370,3 +371,21 @@ class DeleteUserAccountAPI(GenericAPIView):
         user = self.get_object()
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AddressCreateAPI(GenericAPIView):
+    serializer_class = AddressSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save(owner=request.user)
+            return Response(
+                data={'data': {'message': 'address created successfully.'}},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )

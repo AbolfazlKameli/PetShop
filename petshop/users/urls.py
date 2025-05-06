@@ -17,6 +17,10 @@ password = [
     path('reset/', views.ResetPasswordAPI.as_view(), name='reset-password'),
 ]
 
+addresses = [
+    path('create/', views.AddressCreateAPI.as_view(), name='address-create'),
+]
+
 urlpatterns = [
     path('', views.UsersListAPI.as_view(), name='users-list'),
     path('login/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -27,4 +31,5 @@ urlpatterns = [
     path('resend-verification-sms/', views.ResendVerificationSMSAPI.as_view(), name='resend-verification-sms'),
     path('password/', include(password)),
     path('profile/', include(profile)),
+    path('addresses/', include(addresses)),
 ]
