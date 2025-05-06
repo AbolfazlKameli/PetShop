@@ -8,3 +8,10 @@ def validate_iranian_phone_number(value: str):
 
     if not re.match(pattern, value):
         raise ValidationError('Enter a valid iranian phone number.')
+
+
+def validate_postal_code(value: str):
+    pattern = '^\\d{10}$'
+
+    if not re.match(pattern, value):
+        raise ValidationError('یک کد پستی معتبر وارد کنید.')
