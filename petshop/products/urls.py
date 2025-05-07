@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 
-from .apis import categories
+from .apis import categories, products
 
 app_name = 'products'
 
@@ -21,4 +21,5 @@ categories = [
 
 urlpatterns = [
     path('categories/', include(categories)),
+    path('', products.ProductsListAPI.as_view(), name='products-list'),
 ]
