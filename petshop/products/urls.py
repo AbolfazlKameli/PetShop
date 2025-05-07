@@ -22,9 +22,10 @@ categories = [
 urlpatterns = [
     path('categories/', include(categories)),
     path('', products.ProductsListAPI.as_view(), name='products-list'),
+    path('create/', products.ProductCreateAPI.as_view(), name='product-create'),
     re_path(
         r'(?P<product_slug>[-\w]+)/',
         products.ProductRetrieveAPI.as_view(),
         name='product-retrieve',
-    )
+    ),
 ]
