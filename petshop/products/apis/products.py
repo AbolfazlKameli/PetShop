@@ -52,3 +52,23 @@ class ProductCreateAPI(GenericAPIView):
             data={'data': {'errors': serializer.errors}},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class ProductUpdateAPI(GenericAPIView):
+    serializer_class = ProductWriteSerializer
+    permission_classes = (IsAdminUser,)
+    queryset = get_all_products()
+    lookup_url_kwarg = 'product_id'
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, instance=self.get_object())
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                data={'data': {'message': 'Product updated sucessfully.'}},
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )
