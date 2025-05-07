@@ -53,3 +53,18 @@ class ProductCategoryUpdateAPI(GenericAPIView):
             data={'data': {'errors': serializer.errors}},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class ProductCategoryDeleteAPI(GenericAPIView):
+    serializer_class = ProductCategorySerializer
+    queryset = get_all_categories()
+    permission_classes = (IsAdminUser,)
+    lookup_field = 'slug'
+    lookup_url_kwarg = 'category_slug'
+
+    def delete(self, request, *args, **kwargs):
+        category = self.get_object()
+        category.delete()
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
