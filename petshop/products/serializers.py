@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import ProductCategory, Product
+from .selectors import get_all_categories
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -21,3 +22,15 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         exclude = ('slug',)
+
+
+class ProductWriteSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        queryset=get_all_categories(),
+        slug_field='title',
+        required=True
+    )
+
+    class Meta:
+        model = Product
+        exclude = ('slug', 'final_price', 'available')
