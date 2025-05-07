@@ -31,3 +31,25 @@ class ProductCategoryCreateAPI(GenericAPIView):
             data={'data': {'errors': serializer.errors}},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class ProductCategoryUpdateAPI(GenericAPIView):
+    serializer_class = ProductCategorySerializer
+    queryset = get_all_categories()
+    permission_classes = (IsAdminUser,)
+    lookup_field = 'slug'
+    lookup_url_kwarg = 'category_slug'
+
+    def put(self, request, *args, **kwargs):
+        category = self.get_object()
+        serializer = self.serializer_class(data=request.data, instance=category)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                data={'data': {'message': 'Category updated successfully.'}},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            data={'data': {'errors': serializer.errors}},
+            status=status.HTTP_400_BAD_REQUEST
+        )
