@@ -6,8 +6,8 @@ from rest_framework.response import Response
 
 from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.permissions import IsAdminUser
-from .selectors import get_all_categories
-from .serializers import ProductCategorySerializer
+from ..selectors import get_all_categories
+from ..serializers import ProductCategorySerializer
 
 
 class ProductCategoriesListAPI(ListAPIView):
