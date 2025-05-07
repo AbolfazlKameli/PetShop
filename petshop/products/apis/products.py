@@ -23,8 +23,8 @@ class ProductRetrieveAPI(GenericAPIView):
     serializer_class = ProductSerializer
     permission_classes = (AllowAny,)
     queryset = get_all_products()
-    lookup_url_kwarg = 'product_slug'
-    lookup_field = 'slug'
+    lookup_url_kwarg = 'product_id'
+    lookup_field = 'id'
 
     def get(self, request, *args, **kwargs):
         product = self.get_object()
