@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import ProductCategory, Product
+from .models import ProductCategory, Product, ProductDetail
 from .selectors import get_all_categories
 
 
@@ -10,14 +10,21 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         fields = ('title',)
 
 
+class ProductDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductDetail
+        fields = ('key', 'value')
+
+
 class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('title', 'unit_price', 'final_price', 'discount_percent', 'available')
+        fields = ('id', 'title', 'unit_price', 'final_price', 'discount_percent', 'available')
 
 
 class ProductSerializer(serializers.ModelSerializer):
     category = ProductCategorySerializer(read_only=True)
+    details = ProductDetailsSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
