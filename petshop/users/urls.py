@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
+from .apis import auth
 
 app_name = 'users'
 
@@ -26,12 +27,12 @@ addresses = [
 
 urlpatterns = [
     path('', views.UsersListAPI.as_view(), name='users-list'),
-    path('login/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('login/', auth.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('register/', views.UserRegisterAPI.as_view(), name='user-register'),
-    path('verify/', views.UserVerificationAPI.as_view(), name='user-verify'),
-    path('resend-verification-email/', views.ResendVerificationEmailAPI.as_view(), name='resend-verification-email'),
-    path('resend-verification-sms/', views.ResendVerificationSMSAPI.as_view(), name='resend-verification-sms'),
+    path('register/', auth.UserRegisterAPI.as_view(), name='user-register'),
+    path('verify/', auth.UserVerificationAPI.as_view(), name='user-verify'),
+    path('resend-verification-email/', auth.ResendVerificationEmailAPI.as_view(), name='resend-verification-email'),
+    path('resend-verification-sms/', auth.ResendVerificationSMSAPI.as_view(), name='resend-verification-sms'),
     path('password/', include(password)),
     path('profile/', include(profile)),
     path('addresses/', include(addresses)),
