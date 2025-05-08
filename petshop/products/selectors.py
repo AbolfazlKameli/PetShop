@@ -18,7 +18,8 @@ def get_detail_by_id(detail_id: int) -> ProductDetail | None:
 
 
 def get_primary_image(product: Product) -> ProductImage | None:
-    primary_image = product.images.filter(is_primary=True).first()
-    if primary_image is None:
-        primary_image = product.images.first()
-    return primary_image
+    return product.images.filter(is_primary=True).first()
+
+
+def get_latest_image(product: Product) -> ProductImage | None:
+    return product.images.last()

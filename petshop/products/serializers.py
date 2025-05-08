@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import ProductCategory, Product, ProductDetail, ProductImage
-from .selectors import get_all_categories, get_primary_image
+from .selectors import get_all_categories, get_primary_image, get_latest_image
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -27,6 +27,8 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         primary_image = get_primary_image(product=obj)
+        if primary_image is None:
+            primary_image = get_latest_image(product=obj)
         return ProductImageSerializer(instance=primary_image).data
 
     class Meta:
