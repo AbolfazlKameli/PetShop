@@ -23,3 +23,7 @@ def get_primary_image(product: Product) -> ProductImage | None:
 
 def get_latest_image(product: Product) -> ProductImage | None:
     return product.images.last()
+
+
+def get_image_by_id(image_id: int) -> ProductImage | None:
+    return ProductImage.objects.filter(id=image_id).first()
