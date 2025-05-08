@@ -32,7 +32,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductListSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
 
-    def get_image(self, obj):
+    def get_image(self, obj) -> ProductImageSerializer:
         primary_image = get_primary_image(product=obj)
         if primary_image is None:
             primary_image = get_latest_image(product=obj)

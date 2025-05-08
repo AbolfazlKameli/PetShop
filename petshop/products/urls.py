@@ -26,7 +26,8 @@ details_paths = [
 ]
 
 images_paths = [
-    path('create/', images.ProductImageCreate.as_view(), name='image-create'),
+    path('create/', images.ProductImageCreateAPI.as_view(), name='image-create'),
+    path('<int:image_id>/update/', images.ProductImageUpdateAPI.as_view(), name='image-update'),
 ]
 
 urlpatterns = [
