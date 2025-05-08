@@ -59,3 +59,25 @@ class ProductDetailUpdateAPI(GenericAPIView):
             data={'data': {'errors': serializer.errors}},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class ProductDetailDeleteAPI(GenericAPIView):
+    serializer_class = ProductDetailsSerializer
+    permission_classes = (IsAdminUser,)
+
+    def get_object(self):
+        product = get_product_by_id(self.kwargs.get('product_id'))
+        if product is None:
+            raise CustomNotFound('Product not found.')
+
+        detail = get_detail_by_id(self.kwargs.get('detail_id'))
+        if detail is None:
+            raise CustomNotFound('Detail not found.')
+        return detail
+
+    def delete(self, request, *args, **kwargs):
+        detail = self.get_object()
+        detail.delete()
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
