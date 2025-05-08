@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.core.validators import MaxValueValidator, MinValueValidator, FileExtensionValidator
+from django.core.validators import MaxValueValidator, FileExtensionValidator
 from django.db import models
 from django.utils.text import slugify
 
@@ -26,14 +26,14 @@ class Product(BaseModel):
     slug = models.SlugField(max_length=100, allow_unicode=True, db_index=True)
     quantity = models.PositiveSmallIntegerField(
         validators=[MaxValueValidator(1000)],
-        db_index=True
+        db_index=True,
+        default=0
     )
     description = models.TextField()
     available = models.BooleanField(default=True, db_index=True)
     unit_price = models.DecimalField(
         decimal_places=0,
         max_digits=15,
-        validators=[MinValueValidator(1_000)],
         db_index=True
     )
     discount_percent = models.PositiveSmallIntegerField(
@@ -44,9 +44,8 @@ class Product(BaseModel):
     final_price = models.DecimalField(
         decimal_places=0,
         max_digits=15,
-        validators=[MinValueValidator(1_000)],
         default=0,
-        db_index=True
+        db_index=True,
     )
 
     def get_final_price(self):
