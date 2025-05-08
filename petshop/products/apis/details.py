@@ -1,7 +1,9 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
+from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomNotFound
 from petshop.utils.permissions import IsAdminUser
 from ..selectors import get_product_by_id, get_detail_by_id
@@ -9,9 +11,13 @@ from ..serializers import ProductDetailsSerializer
 
 
 class ProductDetailCreateAPI(GenericAPIView):
+    """
+    API for creating product details. Accessible only to the admins.
+    """
     serializer_class = ProductDetailsSerializer
     permission_classes = (IsAdminUser,)
 
+    @extend_schema(responses={201: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -33,6 +39,9 @@ class ProductDetailCreateAPI(GenericAPIView):
 
 
 class ProductDetailUpdateAPI(GenericAPIView):
+    """
+    API for updating product details. Accessible only to the amdins.
+    """
     serializer_class = ProductDetailsSerializer
     permission_classes = (IsAdminUser,)
 
@@ -46,6 +55,7 @@ class ProductDetailUpdateAPI(GenericAPIView):
             raise CustomNotFound('Detail not found.')
         return detail
 
+    @extend_schema(responses={200: ResponseSerializer})
     def put(self, request, *args, **kwargs):
         detail = self.get_object()
         serializer = self.serializer_class(data=request.data, instance=detail)
@@ -62,6 +72,9 @@ class ProductDetailUpdateAPI(GenericAPIView):
 
 
 class ProductDetailDeleteAPI(GenericAPIView):
+    """
+    API for deleting product details. Accessible only to the admins.
+    """
     serializer_class = ProductDetailsSerializer
     permission_classes = (IsAdminUser,)
 
