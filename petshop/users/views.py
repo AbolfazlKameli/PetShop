@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
+from petshop.utils.exceptions import CustomNotFound
 from petshop.utils.permissions import IsAdminUser, NotAuthenticatedUser, IsOwnerUser
 from .models import Address
 from .selectors import (
@@ -316,12 +317,8 @@ class UserProfileUpdateAPI(GenericAPIView):
     def get_object(self):
         user = get_user_by_id(self.request.user.id)
         if user is None:
-            return Response(
-                data={'data': {'message': 'User not found.'}},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            raise CustomNotFound('User not found.')
 
-        self.check_permissions(self.request)
         self.check_object_permissions(self.request, user)
         return user
 
@@ -366,12 +363,8 @@ class DeleteUserAccountAPI(GenericAPIView):
     def get_object(self):
         user = get_user_by_id(self.request.user.id)
         if user is None:
-            return Response(
-                data={'data': {'message': 'User not found.'}},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            raise CustomNotFound('User not found.')
 
-        self.check_permissions(self.request)
         self.check_object_permissions(self.request, user)
         return user
 
