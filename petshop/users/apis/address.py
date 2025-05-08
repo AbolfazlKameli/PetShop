@@ -6,12 +6,12 @@ from rest_framework.response import Response
 
 from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.permissions import IsOwnerUser
-from .models import Address
-from .selectors import (
+from ..models import Address
+from ..selectors import (
     get_all_addresses,
     get_user_addresses
 )
-from .serializers import (
+from ..serializers import (
     AddressSerializer
 )
 

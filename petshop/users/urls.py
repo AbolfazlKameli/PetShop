@@ -1,8 +1,7 @@
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from . import views
-from .apis import auth, user
+from .apis import auth, user, address
 
 app_name = 'users'
 
@@ -10,7 +9,7 @@ profile = [
     path('', user.UserProfileRetrieveAPI.as_view(), name='user-profile'),
     path('update/', user.UserProfileUpdateAPI.as_view(), name='user-profile-update'),
     path('delete/', user.DeleteUserAccountAPI.as_view(), name='user-profile-delete'),
-    path('addresses/', views.UserAddressesListAPI.as_view(), name='user-addresses-list'),
+    path('addresses/', address.UserAddressesListAPI.as_view(), name='user-addresses-list'),
 ]
 
 password = [
@@ -20,9 +19,9 @@ password = [
 ]
 
 addresses = [
-    path('create/', views.AddressCreateAPI.as_view(), name='address-create'),
-    path('<int:address_id>/update/', views.AddressUpdateAPI.as_view(), name='address-update'),
-    path('<int:address_id>/delete/', views.AddressDeleteAPI.as_view(), name='address-delete'),
+    path('create/', address.AddressCreateAPI.as_view(), name='address-create'),
+    path('<int:address_id>/update/', address.AddressUpdateAPI.as_view(), name='address-update'),
+    path('<int:address_id>/delete/', address.AddressDeleteAPI.as_view(), name='address-delete'),
 ]
 
 urlpatterns = [
