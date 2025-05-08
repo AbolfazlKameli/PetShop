@@ -8,6 +8,7 @@ from petshop.utils.exceptions import CustomNotFound, CustomBadRequest
 from petshop.utils.permissions import IsAdminUser
 from ..selectors import get_product_by_id, get_image_by_id
 from ..serializers import ProductImageSerializer
+from ..tasks import delete_picture_from_bucket_task
 
 
 class ProductImageCreateAPI(GenericAPIView):
@@ -52,7 +53,7 @@ class ProductImageUpdateAPI(GenericAPIView):
 
     @extend_schema(responses={200: ResponseSerializer})
     def put(self, request, *args, **kwargs):
-        image, product= self.get_object()
+        image, product = self.get_object()
         serializer = self.serializer_class(data=request.data, instance=image, context={'product': product})
         if serializer.is_valid():
             serializer.save()
@@ -61,3 +62,30 @@ class ProductImageUpdateAPI(GenericAPIView):
                 status=status.HTTP_200_OK
             )
         raise CustomBadRequest(serializer.errors)
+
+
+class ProductImageDeleteAPI(GenericAPIView):
+    """
+    API for deleting product images. Accessible only to the admins.
+    """
+    serializer_class = ProductImageSerializer
+    permission_classes = (IsAdminUser,)
+
+    def get_object(self):
+        product = get_product_by_id(self.kwargs.get('product_id'))
+        if product is None:
+            raise CustomNotFound('Product not found.')
+
+        image = get_image_by_id(self.kwargs.get('image_id'))
+        if image is None:
+            raise CustomNotFound('Image not found.')
+
+        return image
+
+    def delete(self, request, *args, **kwargs):
+        image = self.get_object()
+        delete_picture_from_bucket_task.delay(image.image.name)
+        image.delete()
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
