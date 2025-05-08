@@ -19,7 +19,14 @@ class ProductDetailsSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = '__all__'
+        fields = ('id', 'image', 'is_primary')
+
+    def validate_is_primary(self, data):
+        product = self.context.get('product')
+        primary_image = get_primary_image(product=product)
+        if primary_image is not None and data:
+            raise serializers.ValidationError('You cant choose two primary images for one product.')
+        return data
 
 
 class ProductListSerializer(serializers.ModelSerializer):
