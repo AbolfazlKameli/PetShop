@@ -21,7 +21,7 @@ def generate_otp_code(*, email: str | None = None, phone_number: str | None = No
 
     while True:
         otp_code: str = str(randint(10_000, 99_999))
-        if not cache.get(f'otp_code_{otp_code}'):
+        if not cache.get(f'otp_used_{otp_code}'):
             cache.set(cache_key, otp_code, 300)
             cache.set(f'otp_used_{otp_code}', True, timeout=300)
             return otp_code
