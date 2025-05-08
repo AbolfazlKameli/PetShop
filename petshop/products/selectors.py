@@ -1,4 +1,4 @@
-from .models import ProductCategory, Product
+from .models import ProductCategory, Product, ProductDetail
 
 
 def get_all_categories() -> list[ProductCategory]:
@@ -11,3 +11,7 @@ def get_all_products() -> list[Product]:
 
 def get_product_by_id(product_id: int) -> Product:
     return Product.objects.filter(id=product_id).first()
+
+
+def get_detail_by_id(detail_id: int) -> ProductDetail:
+    return ProductDetail.objects.filter(id=detail_id).first()

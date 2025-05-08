@@ -21,6 +21,7 @@ categories = [
 
 details = [
     path('create/', details.ProductDetailCreateAPI.as_view(), name='detail-create'),
+    path('<int:detail_id>/update/', details.ProductDetailUpdateAPI.as_view(), name='detail-update'),
 ]
 
 urlpatterns = [
