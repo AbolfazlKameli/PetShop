@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from petshop.utils.doc_serializers import ResponseSerializer
-from petshop.utils.exceptions import CustomNotFound
+from petshop.utils.exceptions import CustomNotFound, CustomBadRequest
 from petshop.utils.permissions import IsAdminUser, IsOwnerUser
 from ..selectors import get_all_users, get_user_by_email, get_user_by_id
 from ..serializers import (
@@ -45,10 +45,7 @@ class ChangePasswordAPI(GenericAPIView):
                 data={'data': {'message': 'Your password changed successfully.'}},
                 status=status.HTTP_200_OK
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class SetPasswordAPI(GenericAPIView):
@@ -71,10 +68,7 @@ class SetPasswordAPI(GenericAPIView):
                 data={'data': {'message': 'Password Set successfully.'}},
                 status=status.HTTP_200_OK
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class ResetPasswordAPI(GenericAPIView):
@@ -103,10 +97,7 @@ class ResetPasswordAPI(GenericAPIView):
                 data={'data': {'message': 'We have sent a verification code to your email'}},
                 status=status.HTTP_202_ACCEPTED
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class UserProfileRetrieveAPI(GenericAPIView):
@@ -171,10 +162,7 @@ class UserProfileUpdateAPI(GenericAPIView):
                 data={'data': {'message': message}},
                 status=status.HTTP_200_OK
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class DeleteUserAccountAPI(GenericAPIView):

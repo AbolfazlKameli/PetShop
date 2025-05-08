@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from petshop.utils.doc_serializers import ResponseSerializer
+from petshop.utils.exceptions import CustomBadRequest
 from petshop.utils.permissions import IsAdminUser
 from ..filters import ProductFilter
 from ..selectors import get_all_products
@@ -60,10 +61,7 @@ class ProductCreateAPI(GenericAPIView):
                 data={'data': {'message': 'Product saved successfully.'}},
                 status=status.HTTP_201_CREATED
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class ProductUpdateAPI(GenericAPIView):
@@ -84,10 +82,7 @@ class ProductUpdateAPI(GenericAPIView):
                 data={'data': {'message': 'Product updated sucessfully.'}},
                 status=status.HTTP_200_OK
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class ProductDeleteAPI(GenericAPIView):

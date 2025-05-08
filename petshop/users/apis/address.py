@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from petshop.utils.doc_serializers import ResponseSerializer
+from petshop.utils.exceptions import CustomBadRequest
 from petshop.utils.permissions import IsOwnerUser
 from ..models import Address
 from ..selectors import get_all_addresses, get_user_addresses
@@ -41,10 +42,7 @@ class AddressCreateAPI(GenericAPIView):
                 data={'data': {'message': 'address created successfully.'}},
                 status=status.HTTP_201_CREATED
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class AddressUpdateAPI(GenericAPIView):
@@ -66,10 +64,7 @@ class AddressUpdateAPI(GenericAPIView):
                 data={'data': {'message': 'address updated successfully.'}},
                 status=status.HTTP_200_OK
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class AddressDeleteAPI(GenericAPIView):
