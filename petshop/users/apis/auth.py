@@ -5,11 +5,9 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
+from petshop.utils.exceptions import CustomNotFound
 from petshop.utils.permissions import NotAuthenticatedUser
-from ..selectors import (
-    get_user_by_phone_number,
-    get_user_by_email
-)
+from ..selectors import get_user_by_phone_number, get_user_by_email
 from ..serializers import (
     UserRegisterSerializer,
     UserVerificationSerializer,
@@ -78,10 +76,7 @@ class UserVerificationAPI(GenericAPIView):
             elif email:
                 user = get_user_by_email(email)
             if user is None:
-                return Response(
-                    data={'data': {'errors': 'User account with this credentials not found.'}},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                raise CustomNotFound('User account with this credentials not found.')
 
             if user.is_active:
                 return Response(
@@ -112,10 +107,8 @@ class ResendVerificationEmailAPI(GenericAPIView):
         if serializer.is_valid():
             user = get_user_by_email(serializer.validated_data.get('email'))
             if user is None:
-                return Response(
-                    data={'data': {'message': 'User with this email not found.'}},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                raise CustomNotFound('User with this email not found.')
+
             if user.is_active:
                 return Response(
                     data={'data': {'message': 'This account already is active'}},
@@ -153,10 +146,8 @@ class ResendVerificationSMSAPI(GenericAPIView):
             phone_number = serializer.validated_data.get('phone_number')
             user = get_user_by_phone_number(phone_number=phone_number)
             if user is None:
-                return Response(
-                    data={'data': {'message': 'User with this phone numer not found'}},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                raise CustomNotFound('User with this phone numer not found.')
+
             if user.is_active:
                 return Response(
                     data={'data': {'message': 'This account already is active'}},

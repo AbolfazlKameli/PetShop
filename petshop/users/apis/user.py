@@ -7,11 +7,7 @@ from rest_framework.response import Response
 from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomNotFound
 from petshop.utils.permissions import IsAdminUser, IsOwnerUser
-from ..selectors import (
-    get_all_users,
-    get_user_by_email,
-    get_user_by_id
-)
+from ..selectors import get_all_users, get_user_by_email, get_user_by_id
 from ..serializers import (
     UserSerializer,
     ChangePasswordSerializer,
@@ -68,10 +64,8 @@ class SetPasswordAPI(GenericAPIView):
         if serializer.is_valid():
             user = get_user_by_email(serializer.validated_data.get('email'))
             if user is None:
-                return Response(
-                    data={'data': {'message': 'User with this email not found.'}},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                raise CustomNotFound('User with this email not found.')
+
             change_user_password(user, serializer.validated_data.get('confirm_password'))
             return Response(
                 data={'data': {'message': 'Password Set successfully.'}},
@@ -96,10 +90,8 @@ class ResetPasswordAPI(GenericAPIView):
         if serializer.is_valid():
             user = get_user_by_email(serializer.validated_data.get('email'))
             if user is None:
-                return Response(
-                    data={'data': {'message': 'User with this email not found.'}},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                raise CustomNotFound('User with this email not found.')
+
             otp_code = generate_otp_code(email=user.email)
             content = f'Reset password code: \n{otp_code}'
             send_email_task.delay(
@@ -128,10 +120,8 @@ class UserProfileRetrieveAPI(GenericAPIView):
     def get(self, request, *args, **kwargs):
         user = get_user_by_id(user_id=request.user.id)
         if user is None:
-            return Response(
-                data={'data': {'message': 'User not found.'}},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            raise CustomNotFound('User with this email not found.')
+
         serializer = self.serializer_class(instance=user)
         return Response(
             data={'data': serializer.data},
