@@ -2,21 +2,21 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
-from .apis import auth
+from .apis import auth, user
 
 app_name = 'users'
 
 profile = [
-    path('', views.UserProfileRetrieveAPI.as_view(), name='user-profile'),
-    path('update/', views.UserProfileUpdateAPI.as_view(), name='user-profile-update'),
-    path('delete/', views.DeleteUserAccountAPI.as_view(), name='user-profile-delete'),
+    path('', user.UserProfileRetrieveAPI.as_view(), name='user-profile'),
+    path('update/', user.UserProfileUpdateAPI.as_view(), name='user-profile-update'),
+    path('delete/', user.DeleteUserAccountAPI.as_view(), name='user-profile-delete'),
     path('addresses/', views.UserAddressesListAPI.as_view(), name='user-addresses-list'),
 ]
 
 password = [
-    path('change/', views.ChangePasswordAPI.as_view(), name='change-password'),
-    path('set/', views.SetPasswordAPI.as_view(), name='set-password'),
-    path('reset/', views.ResetPasswordAPI.as_view(), name='reset-password'),
+    path('change/', user.ChangePasswordAPI.as_view(), name='change-password'),
+    path('set/', user.SetPasswordAPI.as_view(), name='set-password'),
+    path('reset/', user.ResetPasswordAPI.as_view(), name='reset-password'),
 ]
 
 addresses = [
@@ -26,7 +26,7 @@ addresses = [
 ]
 
 urlpatterns = [
-    path('', views.UsersListAPI.as_view(), name='users-list'),
+    path('', user.UsersListAPI.as_view(), name='users-list'),
     path('login/', auth.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('register/', auth.UserRegisterAPI.as_view(), name='user-register'),
