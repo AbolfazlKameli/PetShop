@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
-from petshop.utils.exceptions import CustomNotFound
+from petshop.utils.exceptions import CustomNotFound, CustomBadRequest
 from petshop.utils.permissions import NotAuthenticatedUser
 from ..selectors import get_user_by_phone_number, get_user_by_email
 from ..serializers import (
@@ -51,10 +51,7 @@ class UserRegisterAPI(GenericAPIView):
                 data={'data': {'message': 'We have sent a verification code to your email'}},
                 status=status.HTTP_201_CREATED
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class UserVerificationAPI(GenericAPIView):
@@ -71,27 +68,21 @@ class UserVerificationAPI(GenericAPIView):
             phone_number = serializer.validated_data.get('phone_number')
             email = serializer.validated_data.get('email')
             user = None
-            if phone_number:
+            if phone_number is not None:
                 user = get_user_by_phone_number(phone_number)
-            elif email:
+            elif email is not None:
                 user = get_user_by_email(email)
             if user is None:
                 raise CustomNotFound('User account with this credentials not found.')
-
             if user.is_active:
-                return Response(
-                    data={'data': {'message': 'This account already is active'}},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                raise CustomBadRequest('This account already is active.')
+
             activate_user(user=user)
             return Response(
                 data={'data': {'message': 'Account activated successfully.'}},
                 status=status.HTTP_200_OK
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class ResendVerificationEmailAPI(GenericAPIView):
@@ -108,12 +99,8 @@ class ResendVerificationEmailAPI(GenericAPIView):
             user = get_user_by_email(serializer.validated_data.get('email'))
             if user is None:
                 raise CustomNotFound('User with this email not found.')
-
             if user.is_active:
-                return Response(
-                    data={'data': {'message': 'This account already is active'}},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                raise CustomBadRequest('This account already is active.')
 
             otp_code = generate_otp_code(email=user.email)
             content = f'Your verification code: \n{otp_code}'
@@ -126,10 +113,7 @@ class ResendVerificationEmailAPI(GenericAPIView):
                 data={'data': {'message': 'We have sent a verification code to your email'}},
                 status=status.HTTP_202_ACCEPTED
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class ResendVerificationSMSAPI(GenericAPIView):
@@ -147,12 +131,8 @@ class ResendVerificationSMSAPI(GenericAPIView):
             user = get_user_by_phone_number(phone_number=phone_number)
             if user is None:
                 raise CustomNotFound('User with this phone numer not found.')
-
             if user.is_active:
-                return Response(
-                    data={'data': {'message': 'This account already is active'}},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                raise CustomBadRequest('This account already is active.')
 
             otp_code = generate_otp_code(phone_number=user.phone_number)
             content = f'Your verification code: \n{otp_code}'
@@ -161,7 +141,4 @@ class ResendVerificationSMSAPI(GenericAPIView):
                 data={'data': {'message': 'We have sent you a verification code to your phone number.'}},
                 status=status.HTTP_202_ACCEPTED
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest('This account already is active.')

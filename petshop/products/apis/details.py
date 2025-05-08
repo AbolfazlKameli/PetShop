@@ -4,7 +4,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from petshop.utils.doc_serializers import ResponseSerializer
-from petshop.utils.exceptions import CustomNotFound
+from petshop.utils.exceptions import CustomNotFound, CustomBadRequest
 from petshop.utils.permissions import IsAdminUser
 from ..selectors import get_product_by_id, get_detail_by_id
 from ..serializers import ProductDetailsSerializer
@@ -28,14 +28,8 @@ class ProductDetailCreateAPI(GenericAPIView):
                     data={'data': {'message': 'Detail added successfully to the product.'}},
                     status=status.HTTP_201_CREATED
                 )
-            return Response(
-                data={'data': {'message': 'Product not found.'}},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+            raise CustomNotFound('Product not found.')
+        raise CustomBadRequest(serializer.errors)
 
 
 class ProductDetailUpdateAPI(GenericAPIView):
@@ -53,6 +47,7 @@ class ProductDetailUpdateAPI(GenericAPIView):
         detail = get_detail_by_id(self.kwargs.get('detail_id'))
         if detail is None:
             raise CustomNotFound('Detail not found.')
+
         return detail
 
     @extend_schema(responses={200: ResponseSerializer})
@@ -65,10 +60,7 @@ class ProductDetailUpdateAPI(GenericAPIView):
                 data={'data': {'message': 'Detail updated successfully.'}},
                 status=status.HTTP_200_OK
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class ProductDetailDeleteAPI(GenericAPIView):
@@ -86,6 +78,7 @@ class ProductDetailDeleteAPI(GenericAPIView):
         detail = get_detail_by_id(self.kwargs.get('detail_id'))
         if detail is None:
             raise CustomNotFound('Detail not found.')
+
         return detail
 
     def delete(self, request, *args, **kwargs):

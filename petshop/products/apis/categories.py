@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from petshop.utils.doc_serializers import ResponseSerializer
+from petshop.utils.exceptions import CustomBadRequest
 from petshop.utils.permissions import IsAdminUser
 from ..selectors import get_all_categories
 from ..serializers import ProductCategorySerializer
@@ -36,10 +37,7 @@ class ProductCategoryCreateAPI(GenericAPIView):
                 data={'data': {'message': 'Category created successfully.'}},
                 status=status.HTTP_201_CREATED
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class ProductCategoryUpdateAPI(GenericAPIView):
@@ -62,10 +60,7 @@ class ProductCategoryUpdateAPI(GenericAPIView):
                 data={'data': {'message': 'Category updated successfully.'}},
                 status=status.HTTP_201_CREATED
             )
-        return Response(
-            data={'data': {'errors': serializer.errors}},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        raise CustomBadRequest(serializer.errors)
 
 
 class ProductCategoryDeleteAPI(GenericAPIView):
