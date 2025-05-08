@@ -7,7 +7,7 @@ from .selectors import get_all_categories
 class ProductCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductCategory
-        fields = ('title',)
+        fields = ('id', 'title')
 
 
 class ProductDetailsSerializer(serializers.ModelSerializer):

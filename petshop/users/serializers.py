@@ -32,7 +32,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        exclude = ('owner', 'id')
+        exclude = ('owner',)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -40,7 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ('password', 'is_superuser', 'groups', 'user_permissions', 'id')
+        exclude = ('password', 'is_superuser', 'groups', 'user_permissions')
         read_only_fields = ('last_login', 'role', 'is_active')
 
 
