@@ -10,4 +10,5 @@ urlpatterns = [
 
     path('users/', include('petshop.users.urls', namespace='users')),
     path('products/', include('petshop.products.urls', namespace='products')),
+    path('cart/', include('petshop.cart.urls', namespace='cart')),
 ]
