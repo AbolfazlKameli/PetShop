@@ -75,3 +75,4 @@ class ProductDetail(models.Model):
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])])
+    is_primary = models.BooleanField(default=False)

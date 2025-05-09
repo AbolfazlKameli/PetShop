@@ -1,4 +1,4 @@
-from .models import ProductCategory, Product, ProductDetail
+from .models import ProductCategory, Product, ProductDetail, ProductImage
 
 
 def get_all_categories() -> list[ProductCategory]:
@@ -15,3 +15,15 @@ def get_product_by_id(product_id: int) -> Product | None:
 
 def get_detail_by_id(detail_id: int) -> ProductDetail | None:
     return ProductDetail.objects.filter(id=detail_id).first()
+
+
+def get_primary_image(product: Product) -> ProductImage | None:
+    return product.images.filter(is_primary=True).first()
+
+
+def get_latest_image(product: Product) -> ProductImage | None:
+    return product.images.last()
+
+
+def get_image_by_id(image_id: int) -> ProductImage | None:
+    return ProductImage.objects.filter(id=image_id).first()
