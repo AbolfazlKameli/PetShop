@@ -1,10 +1,11 @@
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.response import Response
 
 from petshop.utils.permissions import IsOwnerOrAdminUser
-from .serializers import OrderSerializer
+from .models import Order
 from .selectors import get_all_orders
+from .serializers import OrderSerializer, OrderListSerializer
 
 
 class OrderRetrieveAPI(GenericAPIView):
@@ -20,3 +21,14 @@ class OrderRetrieveAPI(GenericAPIView):
             data={'data': serializer.data},
             status=status.HTTP_200_OK
         )
+
+
+class UserOrdersListAPI(ListAPIView):
+    permission_classes = (IsOwnerOrAdminUser,)
+    serializer_class = OrderListSerializer
+    filterset_fields = ('status',)
+
+    def get_queryset(self) -> list[Order]:
+        if getattr(self, 'swagger_fake_view', False):
+            return Order.objects.none()
+        return self.request.user.orders.all()
