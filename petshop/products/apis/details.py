@@ -7,14 +7,15 @@ from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomNotFound, CustomBadRequest
 from petshop.utils.permissions import IsAdminUser
 from ..selectors import get_product_by_id, get_detail_by_id
-from ..serializers import ProductDetailsSerializer
+from ..serializers import ProductDetailsSerializer, ProductDetailCreateSerializer
+from ..services import create_product_details
 
 
 class ProductDetailCreateAPI(GenericAPIView):
     """
     API for creating product details. Accessible only to the admins.
     """
-    serializer_class = ProductDetailsSerializer
+    serializer_class = ProductDetailCreateSerializer
     permission_classes = (IsAdminUser,)
 
     @extend_schema(responses={201: ResponseSerializer})
@@ -23,7 +24,7 @@ class ProductDetailCreateAPI(GenericAPIView):
         if serializer.is_valid():
             product = get_product_by_id(kwargs.get('product_id'))
             if product is not None:
-                serializer.save(product=product)
+                create_product_details(product, serializer.validated_data.get('details'))
                 return Response(
                     data={'data': {'message': 'Detail added successfully to the product.'}},
                     status=status.HTTP_201_CREATED
