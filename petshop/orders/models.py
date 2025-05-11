@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db import models
 
@@ -27,6 +30,24 @@ class Order(BaseModel):
     class Meta:
         ordering = ('-created_date',)
 
+    def remove_if_no_item(self):
+        items_count = self.items.count()
+        if items_count == 0:
+            self.delete()
+
+    def get_total_price(self):
+        price = round(
+            sum([item.get_total_price() for item in self.items.all()])
+        )
+        if self.discount_percent > 0:
+            discount_amount = price * Decimal(self.discount_percent / 100)
+            price -= discount_amount
+        return round(price)
+
+    def get_total_quantity(self):
+        quantity = sum([item.quantity for item in self.items.all()])
+        return quantity
+
 
 class OrderItem(BaseModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
@@ -39,3 +60,21 @@ class OrderItem(BaseModel):
 
     class Meta:
         ordering = ('-created_date',)
+
+    def clean(self):
+        if not self.product.available:
+            raise ValidationError('Product is not available.')
+
+        if self.quantity > self.product.quantity:
+            raise ValidationError('The quantity you requested is more than what is currently available in stock.')
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        if self.quantity == 0:
+            self.delete()
+        else:
+            super().save(*args, **kwargs)
+
+    def get_total_price(self):
+        price = self.product.get_final_price() * self.quantity
+        return price
