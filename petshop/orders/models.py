@@ -32,7 +32,7 @@ class Order(BaseModel):
 
     def get_total_price(self):
         price = round(
-            sum([item.get_total_price() for item in self.items.all()])
+            sum(item.get_total_price() for item in self.items.all())
         )
         if self.discount_percent > 0:
             discount_amount = price * Decimal(self.discount_percent / 100)
@@ -40,7 +40,7 @@ class Order(BaseModel):
         return round(price)
 
     def get_total_quantity(self):
-        quantity = sum([item.quantity for item in self.items.all()])
+        quantity = sum(item.quantity for item in self.items.all())
         return quantity
 
 
