@@ -30,11 +30,6 @@ class Order(BaseModel):
     class Meta:
         ordering = ('-created_date',)
 
-    def remove_if_no_item(self):
-        items_count = self.items.count()
-        if items_count == 0:
-            self.delete()
-
     def get_total_price(self):
         price = round(
             sum([item.get_total_price() for item in self.items.all()])
@@ -67,13 +62,6 @@ class OrderItem(BaseModel):
 
         if self.quantity > self.product.quantity:
             raise ValidationError('The quantity you requested is more than what is currently available in stock.')
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        if self.quantity == 0:
-            self.delete()
-        else:
-            super().save(*args, **kwargs)
 
     def get_total_price(self):
         price = self.product.get_final_price() * self.quantity
