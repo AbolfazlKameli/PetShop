@@ -16,6 +16,18 @@ class ProductDetailsSerializer(serializers.ModelSerializer):
         fields = ('id', 'key', 'value')
 
 
+class ProductDetailCreateSerializer(serializers.Serializer):
+    details = ProductDetailsSerializer(many=True, required=True)
+
+    def validate(self, attrs):
+        details = attrs.get('details')
+        if not details:
+            raise serializers.ValidationError(
+                {'details': 'Expected a list of items.'}
+            )
+        return attrs
+
+
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
