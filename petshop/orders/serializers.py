@@ -14,10 +14,10 @@ class OrderSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField(read_only=True)
     total_quantity = serializers.SerializerMethodField(read_only=True)
 
-    def get_total_price(self, obj):
+    def get_total_price(self, obj) -> int:
         return obj.get_total_price()
 
-    def get_total_quantity(self, obj):
+    def get_total_quantity(self, obj) -> int:
         return obj.get_total_quantity()
 
     class Meta:
