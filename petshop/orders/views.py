@@ -3,12 +3,13 @@ from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from petshop.utils.exceptions import CustomBadRequest
+from petshop.utils.exceptions import CustomBadRequest, CustomNotFound
 from petshop.utils.permissions import IsOwnerOrAdminUser
+from .choices import ORDER_STATUS_PENDING
 from .models import Order
-from .selectors import get_all_orders
+from .selectors import get_all_orders, get_order_by_id, check_order_status
 from .serializers import OrderSerializer, OrderListSerializer, OrderCreateSerializer
-from .services import create_order
+from .services import create_order, cancel_order
 
 
 class OrderRetrieveAPI(GenericAPIView):
@@ -50,3 +51,27 @@ class OrderCreateAPI(GenericAPIView):
                 status=status.HTTP_201_CREATED
             )
         raise CustomBadRequest(serializer.errors)
+
+
+class OrderCancelAPI(GenericAPIView):
+    permission_classes = (IsOwnerOrAdminUser,)
+    lookup_url_kwarg = 'order_id'
+    serializer_class = OrderSerializer
+    allowed_statuses = [ORDER_STATUS_PENDING]
+
+    def get_object(self):
+        order = get_order_by_id(self.kwargs.get('order_id'))
+        if order is None or not check_order_status(order, self.allowed_statuses):
+            raise CustomNotFound('Could`nt find any pending order with this id.')
+
+        self.check_object_permissions(self.request, order)
+
+        return order
+
+    def get(self, request, *args, **kwargs):
+        order = self.get_object()
+        cancel_order(order)
+        return Response(
+            data={'data': {'message': 'Order cancelled successfully.'}},
+            status=status.HTTP_200_OK
+        )
