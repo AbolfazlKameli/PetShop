@@ -6,7 +6,7 @@ from .models import Order, OrderItem
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = '__all__'
+        exclude = ('order',)
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -29,3 +29,38 @@ class OrderListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ('id', 'status', 'discount_percent', 'created_date', 'updated_date', 'owner')
+
+
+class OrderCreateSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ('items',)
+
+    def validate(self, attrs):
+        items = attrs.get('items')[0]
+        product = items.get('product')
+        quantity = items.get('quantity')
+
+        if not items:
+            raise serializers.ValidationError({'items': 'There is no items in data.'})
+
+        if not product.available:
+            raise serializers.ValidationError({'items': [{'product': ['This product is out of stock.']}]})
+
+        if product.quantity < quantity or quantity <= 0:
+            raise serializers.ValidationError({
+                'items': [
+                    {'quantity': ['The quantity you requested is more than what is currently available in stock.']}
+                ]
+            })
+
+        if quantity > 100:
+            raise serializers.ValidationError({
+                'items': [
+                    {'quantity': ['You can`t order more than 100 products.']}
+                ]
+            })
+
+        return attrs
