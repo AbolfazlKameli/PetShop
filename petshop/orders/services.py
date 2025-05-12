@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from petshop.products.models import Product
+from .choices import ORDER_STATUS_CANCELLED
 from .models import Order, OrderItem
 
 User = get_user_model()
@@ -26,4 +27,18 @@ def create_order(owner: User, data: list[dict[str, int | Product]]):
     Product.objects.bulk_update(products_to_update, ['quantity'])
     OrderItem.objects.bulk_create(items)
 
+    return order
+
+
+@transaction.atomic
+def cancel_order(order: Order) -> Order:
+    order.status = ORDER_STATUS_CANCELLED
+    products_to_update = []
+
+    for item in order.items.all():
+        item.product.quantity += item.quantity
+        products_to_update.append(item.product)
+
+    Product.objects.bulk_update(products_to_update, ['quantity'])
+    order.save()
     return order
