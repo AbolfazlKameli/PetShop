@@ -46,6 +46,16 @@ class UserOrdersListAPI(ListAPIView):
         return self.request.user.orders.all()
 
 
+class OrdersListAPI(ListAPIView):
+    """
+    API for listing all orders. Accessible only to the admins.
+    """
+    permission_classes = (IsAdminUser,)
+    serializer_class = OrderListSerializer
+    queryset = get_all_orders()
+    filterset_fields = ('status',)
+
+
 class OrderCreateAPI(GenericAPIView):
     """
     API for creating an order for authenticated user. Accessibleo only to authenticated users.
