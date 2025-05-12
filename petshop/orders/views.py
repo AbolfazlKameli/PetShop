@@ -1,8 +1,10 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomBadRequest, CustomNotFound
 from petshop.utils.permissions import IsOwnerOrAdminUser
 from .choices import ORDER_STATUS_PENDING
@@ -13,6 +15,9 @@ from .services import create_order, cancel_order
 
 
 class OrderRetrieveAPI(GenericAPIView):
+    """
+    API for retrieving authenticated user orders. Accessible only to the users themselves or admins.
+    """
     serializer_class = OrderSerializer
     permission_classes = (IsOwnerOrAdminUser,)
     lookup_url_kwarg = 'order_id'
@@ -28,6 +33,9 @@ class OrderRetrieveAPI(GenericAPIView):
 
 
 class UserOrdersListAPI(ListAPIView):
+    """
+    API for listing authenticated user orders. Accessible only to the users themselves or admins.
+    """
     permission_classes = (IsOwnerOrAdminUser,)
     serializer_class = OrderListSerializer
     filterset_fields = ('status',)
@@ -39,9 +47,13 @@ class UserOrdersListAPI(ListAPIView):
 
 
 class OrderCreateAPI(GenericAPIView):
+    """
+    API for creating an order for authenticated user. Accessibleo only to authenticated users.
+    """
     permission_classes = (IsAuthenticated,)
     serializer_class = OrderCreateSerializer
 
+    @extend_schema(responses={201: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -54,6 +66,9 @@ class OrderCreateAPI(GenericAPIView):
 
 
 class OrderCancelAPI(GenericAPIView):
+    """
+    API for canceling an order. Accessible only to order owner or admins.
+    """
     permission_classes = (IsOwnerOrAdminUser,)
     lookup_url_kwarg = 'order_id'
     serializer_class = OrderSerializer
@@ -68,6 +83,7 @@ class OrderCancelAPI(GenericAPIView):
 
         return order
 
+    @extend_schema(responses={200: ResponseSerializer})
     def get(self, request, *args, **kwargs):
         order = self.get_object()
         cancel_order(order)
