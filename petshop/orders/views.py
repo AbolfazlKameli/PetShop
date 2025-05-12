@@ -53,8 +53,7 @@ class OrdersListAPI(ListAPIView):
     permission_classes = (IsAdminUser,)
     serializer_class = OrderListSerializer
     queryset = get_all_orders()
-    fitlerset_fields = ('status',)
-    search_fields = ('owner__email', 'owner__username', 'product__title')
+    filterset_fields = ('status',)
 
 
 class OrderCreateAPI(GenericAPIView):
