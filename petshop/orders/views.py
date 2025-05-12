@@ -1,11 +1,14 @@
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from petshop.utils.exceptions import CustomBadRequest
 from petshop.utils.permissions import IsOwnerOrAdminUser
 from .models import Order
 from .selectors import get_all_orders
-from .serializers import OrderSerializer, OrderListSerializer
+from .serializers import OrderSerializer, OrderListSerializer, OrderCreateSerializer
+from .services import create_order
 
 
 class OrderRetrieveAPI(GenericAPIView):
@@ -32,3 +35,18 @@ class UserOrdersListAPI(ListAPIView):
         if getattr(self, 'swagger_fake_view', False):
             return Order.objects.none()
         return self.request.user.orders.all()
+
+
+class OrderCreateAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = OrderCreateSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            create_order(request.user, serializer.validated_data.get('items'))
+            return Response(
+                data={'data': {'message': 'Order created successfully.'}},
+                status=status.HTTP_201_CREATED
+            )
+        raise CustomBadRequest(serializer.errors)
