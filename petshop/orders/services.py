@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from petshop.products.models import Product
-from .choices import ORDER_STATUS_CANCELLED
+from .choices import ORDER_STATUS_CANCELLED, ORDER_STATUS_SUCCESS
 from .models import Order, OrderItem
 
 User = get_user_model()
@@ -40,5 +40,11 @@ def cancel_order(order: Order) -> Order:
         products_to_update.append(item.product)
 
     Product.objects.bulk_update(products_to_update, ['quantity'])
+    order.save()
+    return order
+
+
+def accept_order(order: Order) -> Order:
+    order.status = ORDER_STATUS_SUCCESS
     order.save()
     return order
