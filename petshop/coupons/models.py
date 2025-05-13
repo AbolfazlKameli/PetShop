@@ -10,7 +10,7 @@ from petshop.utils.utils import BaseModel
 
 
 class Coupon(BaseModel):
-    code = models.CharField(max_length=50, unique=True, db_index=True)
+    code = models.SlugField(max_length=50, unique=True, db_index=True)
     discount_percent = models.PositiveSmallIntegerField(
         validators=[MaxValueValidator(100)],
         db_index=True
