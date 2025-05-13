@@ -4,10 +4,10 @@ from .models import Coupon
 
 
 class CouponSerializer(serializers.ModelSerializer):
-    is_expired = serializers.SerializerMethodField()
+    is_valid = serializers.SerializerMethodField()
 
-    def get_is_expired(self, obj) -> bool:
-        return obj.is_expired
+    def get_is_valid(self, obj) -> bool:
+        return obj.is_valid
 
     class Meta:
         model = Coupon
