@@ -29,3 +29,12 @@ class CouponApplySerializer(serializers.Serializer):
         if data.coupon is not None:
             raise serializers.ValidationError('You can`t apply more than one coupon on an order.')
         return data
+
+
+class CouponDiscardSerializer(serializers.Serializer):
+    order = serializers.PrimaryKeyRelatedField(queryset=get_pending_orders(), write_only=True, required=True)
+
+    def validate_order(self, data):
+        if data.coupon is None:
+            raise serializers.ValidationError('This order does`nt have any coupons.')
+        return data
