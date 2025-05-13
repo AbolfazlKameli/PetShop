@@ -1,7 +1,10 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.response import Response
 
+from petshop.utils.exceptions import CustomBadRequest
+from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.permissions import IsAdminUser
 from .filters import CouponFilter
 from .selectors import get_all_coupons
@@ -34,3 +37,22 @@ class CouponRetrieveAPI(GenericAPIView):
             data={'data': serializer.data},
             status=status.HTTP_200_OK
         )
+
+
+class CouponCreateAPI(GenericAPIView):
+    """
+    API for creating Coupons. Accessible only to admins.
+    """
+    serializer_class = CouponSerializer
+    permission_classes = (IsAdminUser,)
+
+    @extend_schema(responses={201: ResponseSerializer})
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                data={'data': {'message': 'Coupon created successfully.'}},
+                status=status.HTTP_201_CREATED
+            )
+        raise CustomBadRequest(serializer.errors)
