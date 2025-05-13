@@ -52,6 +52,7 @@ LOCAL_APPS = [
     'petshop.users.apps.UsersConfig',
     'petshop.products.apps.ProductsConfig',
     'petshop.orders.apps.OrdersConfig',
+    'petshop.coupons.apps.CouponsConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
