@@ -8,6 +8,7 @@ from petshop.utils.exceptions import CustomBadRequest
 from petshop.utils.permissions import IsAdminUser
 from .filters import CouponFilter
 from .selectors import get_all_coupons, get_valid_coupons
+from .services import discard_coupon
 from .serializers import CouponSerializer
 
 
@@ -78,3 +79,21 @@ class CouponUpdateAPI(GenericAPIView):
                 status=status.HTTP_200_OK
             )
         raise CustomBadRequest(serializer.errors)
+
+
+class CouponDeleteAPI(GenericAPIView):
+    """
+    API for deleting Coupons. Accessible only to the admins.
+    """
+    serializer_class = CouponSerializer
+    permission_classes = (IsAdminUser,)
+    lookup_url_kwarg = 'coupon_id'
+    queryset = get_all_coupons()
+
+    def delete(self, request, *args, **kwargs):
+        coupon = self.get_object()
+        discard_coupon(coupon, coupon.orders.all())
+        coupon.delete()
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
