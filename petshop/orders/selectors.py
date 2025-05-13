@@ -3,11 +3,11 @@ from .models import Order
 
 
 def get_all_orders() -> list[Order]:
-    return Order.objects.all()
+    return Order.objects.prefetch_related('items').all()
 
 
 def get_pending_orders() -> list[Order]:
-    return Order.objects.filter(status=ORDER_STATUS_PENDING)
+    return Order.objects.prefetch_related('coupon').filter(status=ORDER_STATUS_PENDING)
 
 
 def get_order_by_id(order_id: int) -> Order:

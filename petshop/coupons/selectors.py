@@ -7,7 +7,7 @@ from .models import Coupon
 
 
 def get_all_coupons() -> list[Coupon]:
-    return Coupon.objects.prefetch_related('orders').all()
+    return Coupon.objects.all()
 
 
 def get_valid_coupons() -> list[Coupon]:
