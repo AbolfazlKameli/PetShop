@@ -8,7 +8,7 @@ from petshop.utils.exceptions import CustomBadRequest
 from petshop.utils.permissions import IsAdminUser, IsOwnerOrAdminUser
 from .filters import CouponFilter
 from .selectors import get_all_coupons, get_valid_coupons
-from .serializers import CouponSerializer, CouponApplySerializer
+from .serializers import CouponSerializer, CouponApplySerializer, CouponDiscardSerializer
 from .services import discard_coupon, apply_coupon
 
 
@@ -106,6 +106,7 @@ class CouponApplyAPI(GenericAPIView):
     serializer_class = CouponApplySerializer
     permission_classes = (IsOwnerOrAdminUser,)
 
+    @extend_schema(responses={200: ResponseSerializer})
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -117,6 +118,31 @@ class CouponApplyAPI(GenericAPIView):
 
             return Response(
                 data={'data': {'message': 'Coupon applied successfully.'}},
+                status=status.HTTP_200_OK
+            )
+        raise CustomBadRequest(serializer.errors)
+
+
+class CouponDiscardAPI(GenericAPIView):
+    """
+    API for discarding Coupons. Accessible to orders owners and admins.
+    """
+    serializer_class = CouponDiscardSerializer
+    permission_classes = (IsOwnerOrAdminUser,)
+
+    @extend_schema(responses={200: ResponseSerializer})
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            order = serializer.validated_data.get('order')
+            coupon = order.coupon
+
+            self.check_object_permissions(request, order)
+
+            discard_coupon(coupon, [order])
+
+            return Response(
+                data={'data': {'message': 'Coupon discarded successfully.'}},
                 status=status.HTTP_200_OK
             )
         raise CustomBadRequest(serializer.errors)
