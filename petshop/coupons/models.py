@@ -1,3 +1,8 @@
+from datetime import datetime
+
+import pytz
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db import models
 
@@ -15,3 +20,12 @@ class Coupon(BaseModel):
 
     class Meta:
         ordering = ('-created_date',)
+
+    @property
+    def is_expired(self):
+        now = datetime.now(tz=pytz.timezone(settings.TIME_ZONE))
+        return now > self.expiration_date
+
+    def clean(self):
+        if self.is_expired:
+            raise ValidationError('You can`t choose past time as expiration.')
