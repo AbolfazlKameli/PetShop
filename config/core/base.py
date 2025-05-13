@@ -45,13 +45,15 @@ THIRD_PARTY_APPS = [
     'corsheaders',
     'django_filters',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
+    'django_celery_beat',
 ]
 
 LOCAL_APPS = [
     'petshop.users.apps.UsersConfig',
     'petshop.products.apps.ProductsConfig',
     'petshop.orders.apps.OrdersConfig',
+    'petshop.coupons.apps.CouponsConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

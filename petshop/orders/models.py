@@ -7,6 +7,7 @@ from django.db import models
 
 from petshop.products.models import Product
 from petshop.utils.utils import BaseModel
+from petshop.coupons.models import Coupon
 from .choices import ORDER_STATUS_CHOICES, ORDER_STATUS_PENDING
 
 User = get_user_model()
@@ -21,6 +22,7 @@ class Order(BaseModel):
         db_index=True,
         verbose_name='Order Status'
     )
+    coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, related_name='orders', blank=True, null=True)
     discount_percent = models.PositiveSmallIntegerField(
         validators=[MaxValueValidator(100)],
         default=0,
