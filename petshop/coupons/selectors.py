@@ -1,5 +1,15 @@
+from datetime import datetime
+
+import pytz
+from django.conf import settings
+
 from .models import Coupon
 
 
 def get_all_coupons() -> list[Coupon]:
     return Coupon.objects.all()
+
+
+def get_valid_coupons() -> list[Coupon]:
+    now = datetime.now(tz=pytz.timezone(settings.TIME_ZONE))
+    return Coupon.objects.filter(expiration_date__gt=now)
