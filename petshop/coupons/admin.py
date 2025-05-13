@@ -1,3 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Coupon
+
+
+@admin.register(Coupon)
+class CouponModelAdmin(admin.ModelAdmin):
+    list_display = ('code', 'expiration_date', 'id', 'discount_percent')
+    search_fields = ('code',)
