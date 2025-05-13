@@ -1,8 +1,13 @@
+from .choices import ORDER_STATUS_PENDING
 from .models import Order
 
 
 def get_all_orders() -> list[Order]:
     return Order.objects.all()
+
+
+def get_pending_orders() -> list[Order]:
+    return Order.objects.filter(status=ORDER_STATUS_PENDING)
 
 
 def get_order_by_id(order_id: int) -> Order:

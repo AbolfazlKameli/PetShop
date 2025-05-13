@@ -12,4 +12,4 @@ def get_all_coupons() -> list[Coupon]:
 
 def get_valid_coupons() -> list[Coupon]:
     now = datetime.now(tz=pytz.timezone(settings.TIME_ZONE))
-    return Coupon.objects.filter(expiration_date__gt=now)
+    return Coupon.objects.prefetch_related('orders').filter(expiration_date__gt=now)
