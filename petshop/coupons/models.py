@@ -22,10 +22,10 @@ class Coupon(BaseModel):
         ordering = ('-created_date',)
 
     @property
-    def is_expired(self):
+    def is_valid(self):
         now = datetime.now(tz=pytz.timezone(settings.TIME_ZONE))
-        return now > self.expiration_date
+        return now < self.expiration_date
 
     def clean(self):
-        if self.is_expired:
+        if not self.is_valid:
             raise ValidationError('You can`t choose past time as expiration.')
