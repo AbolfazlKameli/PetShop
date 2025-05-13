@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:coupon_id>/', views.CouponRetrieveAPI.as_view(), name='coupon-retrieve'),
     path('<int:coupon_id>/update/', views.CouponUpdateAPI.as_view(), name='coupon-update'),
     path('<int:coupon_id>/delete/', views.CouponDeleteAPI.as_view(), name='coupon-delete'),
+    path('apply/', views.CouponApplyAPI.as_view(), name='coupon-apply'),
 ]

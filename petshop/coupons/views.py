@@ -5,11 +5,11 @@ from rest_framework.response import Response
 
 from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomBadRequest
-from petshop.utils.permissions import IsAdminUser
+from petshop.utils.permissions import IsAdminUser, IsOwnerOrAdminUser
 from .filters import CouponFilter
 from .selectors import get_all_coupons, get_valid_coupons
-from .services import discard_coupon
-from .serializers import CouponSerializer
+from .serializers import CouponSerializer, CouponApplySerializer
+from .services import discard_coupon, apply_coupon
 
 
 class CouponsListAPI(ListAPIView):
@@ -97,3 +97,26 @@ class CouponDeleteAPI(GenericAPIView):
         return Response(
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+class CouponApplyAPI(GenericAPIView):
+    """
+    API for applying Coupons to orders. Accessible to orders owners or admins.
+    """
+    serializer_class = CouponApplySerializer
+    permission_classes = (IsOwnerOrAdminUser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            order = serializer.validated_data.get('order')
+            coupon = serializer.validated_data.get('coupon')
+            self.check_object_permissions(request, order)
+
+            apply_coupon(order=order, coupon=coupon)
+
+            return Response(
+                data={'data': {'message': 'Coupon applied successfully.'}},
+                status=status.HTTP_200_OK
+            )
+        raise CustomBadRequest(serializer.errors)
