@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 
-from .apis import categories, products, details, images
+from .apis import categories, products, details, images, reviews
 
 app_name = 'products'
 
@@ -31,6 +31,10 @@ images_paths = [
     path('<int:image_id>/delete/', images.ProductImageDeleteAPI.as_view(), name='image-delete'),
 ]
 
+reviews_paths = [
+    path('create/', reviews.ProductReviewCreateAPI.as_view(), name='review-create'),
+]
+
 urlpatterns = [
     path('categories/', include(categories_paths)),
     path('', products.ProductsListAPI.as_view(), name='products-list'),
@@ -40,4 +44,5 @@ urlpatterns = [
     path('<int:product_id>/', products.ProductRetrieveAPI.as_view(), name='product-retrieve'),
     path('<int:product_id>/details/', include(details_paths)),
     path('<int:product_id>/images/', include(images_paths)),
+    path('<int:product_id>/reviews/', include(reviews_paths)),
 ]

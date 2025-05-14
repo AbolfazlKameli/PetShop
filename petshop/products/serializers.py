@@ -45,6 +45,8 @@ class ProductReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductReview
         exclude = ('product',)
+        read_only_fields = ('owner', 'status')
+
 
 class ProductListSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
