@@ -1,7 +1,8 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import ProductCategory, Product, ProductDetail, ProductImage, ProductReview
-from .selectors import get_all_categories, get_primary_image, get_latest_image
+from .selectors import get_all_categories, get_primary_image, get_latest_image, get_approved_reviews
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -70,7 +71,12 @@ class ProductSerializer(serializers.ModelSerializer):
     category = ProductCategorySerializer(read_only=True)
     details = ProductDetailsSerializer(read_only=True, many=True)
     images = ProductImageSerializer(many=True, read_only=True)
-    reviews = ProductReviewSerializer(many=True, read_only=True)
+    reviews = serializers.SerializerMethodField(read_only=True)
+
+    @extend_schema_field(field=ProductReviewSerializer(many=True))
+    def get_reviews(self, obj):
+        reviews = get_approved_reviews(obj)
+        return ProductReviewSerializer(instance=reviews, many=True).data
 
     class Meta:
         model = Product
