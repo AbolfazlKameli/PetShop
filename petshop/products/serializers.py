@@ -1,7 +1,9 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from .models import ProductCategory, Product, ProductDetail, ProductImage
-from .selectors import get_all_categories, get_primary_image, get_latest_image
+from .choices import REVIEW_STATUS_CHOICES
+from .models import ProductCategory, Product, ProductDetail, ProductImage, ProductReview
+from .selectors import get_all_categories, get_primary_image, get_latest_image, get_approved_reviews
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -41,8 +43,16 @@ class ProductImageSerializer(serializers.ModelSerializer):
         return data
 
 
+class ProductReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductReview
+        exclude = ('product',)
+        read_only_fields = ('owner', 'status')
+
+
 class ProductListSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(read_only=True)
+    rate = serializers.SerializerMethodField(read_only=True)
 
     def get_image(self, obj) -> ProductImageSerializer:
         primary_image = get_primary_image(product=obj)
@@ -50,15 +60,24 @@ class ProductListSerializer(serializers.ModelSerializer):
             primary_image = get_latest_image(product=obj)
         return ProductImageSerializer(instance=primary_image).data
 
+    def get_rate(self, obj) -> int:
+        return obj.overall_rate
+
     class Meta:
         model = Product
-        fields = ('id', 'title', 'unit_price', 'final_price', 'discount_percent', 'available', 'image')
+        fields = ('id', 'title', 'unit_price', 'final_price', 'discount_percent', 'available', 'image', 'rate')
 
 
 class ProductSerializer(serializers.ModelSerializer):
     category = ProductCategorySerializer(read_only=True)
     details = ProductDetailsSerializer(read_only=True, many=True)
     images = ProductImageSerializer(many=True, read_only=True)
+    reviews = serializers.SerializerMethodField(read_only=True)
+
+    @extend_schema_field(field=ProductReviewSerializer(many=True))
+    def get_reviews(self, obj):
+        reviews = get_approved_reviews(obj)
+        return ProductReviewSerializer(instance=reviews, many=True).data
 
     class Meta:
         model = Product
@@ -75,3 +94,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         exclude = ('slug', 'final_price', 'available')
+
+
+class ReviewChangeStatusSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=REVIEW_STATUS_CHOICES, required=True, write_only=True)

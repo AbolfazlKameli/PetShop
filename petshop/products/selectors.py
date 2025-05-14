@@ -1,4 +1,5 @@
-from .models import ProductCategory, Product, ProductDetail, ProductImage
+from .choices import REVIEW_STATUS_APPROVED
+from .models import ProductCategory, Product, ProductDetail, ProductImage, ProductReview
 
 
 def get_all_categories() -> list[ProductCategory]:
@@ -6,7 +7,7 @@ def get_all_categories() -> list[ProductCategory]:
 
 
 def get_all_products() -> list[Product]:
-    return Product.objects.select_related('category').all()
+    return Product.objects.select_related('category').prefetch_related('reviews', 'details', 'images').all()
 
 
 def get_product_by_id(product_id: int) -> Product | None:
@@ -27,3 +28,15 @@ def get_latest_image(product: Product) -> ProductImage | None:
 
 def get_image_by_id(image_id: int) -> ProductImage | None:
     return ProductImage.objects.filter(id=image_id).first()
+
+
+def get_approved_reviews(product: Product) -> list[ProductReview]:
+    return product.reviews.filter(status=REVIEW_STATUS_APPROVED)
+
+
+def get_review_by_product_and_id(product: Product, review_id: int) -> ProductReview | None:
+    return product.reviews.filter(id=review_id).first()
+
+
+def get_reviews_by_product(product: Product) -> list[ProductReview]:
+    return product.reviews.all()
