@@ -32,6 +32,10 @@ def get_image_by_product_and_id(product: Product, image_id: int) -> ProductImage
     return product.images.filter(id=image_id).first()
 
 
+def nothing_review():
+    return ProductReview.objects.none()
+
+
 def get_approved_reviews(product: Product) -> list[ProductReview]:
     return product.reviews.filter(status=REVIEW_STATUS_APPROVED)
 
@@ -42,7 +46,3 @@ def get_review_by_product_and_id(product: Product, review_id: int) -> ProductRev
 
 def get_reviews_by_product(product: Product) -> list[ProductReview]:
     return product.reviews.all()
-
-
-def nothing_review():
-    return ProductReview.objects.none()
