@@ -1,10 +1,15 @@
 from decimal import Decimal
 
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, FileExtensionValidator
 from django.db import models
+from django.db.models import Avg
 from django.utils.text import slugify
 
 from petshop.utils.utils import BaseModel
+from .choices import REVIEW_STATUS_CHOICES, REVIEW_STATUS_PENDING
+
+User = get_user_model()
 
 
 class ProductCategory(models.Model):
@@ -56,6 +61,11 @@ class Product(BaseModel):
         else:
             return round(self.unit_price)
 
+    @property
+    def overall_rate(self):
+        avg_rate = self.reviews.aggregate(avg=Avg('rate'))['avg']
+        return round(avg_rate, 1) if avg_rate is not None else 0
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title, allow_unicode=True)
         self.final_price = self.get_final_price()
@@ -76,3 +86,21 @@ class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(validators=[FileExtensionValidator(['png', 'jpg', 'jpeg'])])
     is_primary = models.BooleanField(default=False)
+
+
+class ProductReview(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='product_reviews')
+    body = models.CharField(max_length=250)
+    status = models.CharField(
+        max_length=10,
+        choices=REVIEW_STATUS_CHOICES,
+        default=REVIEW_STATUS_PENDING,
+        db_index=True,
+        verbose_name='Product Review Status'
+    )
+    rate = models.PositiveSmallIntegerField(validators=[MaxValueValidator(5)], db_index=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created_date',)

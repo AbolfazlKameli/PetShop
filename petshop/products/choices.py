@@ -1,0 +1,9 @@
+REVIEW_STATUS_APPROVED = 'approved'
+REVIEW_STATUS_REJECTED = 'rejected'
+REVIEW_STATUS_PENDING = 'pending'
+
+REVIEW_STATUS_CHOICES = (
+    (REVIEW_STATUS_APPROVED, 'approved'),
+    (REVIEW_STATUS_REJECTED, 'rejected'),
+    (REVIEW_STATUS_PENDING, 'pending')
+)
