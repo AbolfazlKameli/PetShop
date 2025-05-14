@@ -1,6 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from .choices import REVIEW_STATUS_CHOICES
 from .models import ProductCategory, Product, ProductDetail, ProductImage, ProductReview
 from .selectors import get_all_categories, get_primary_image, get_latest_image, get_approved_reviews
 
@@ -93,3 +94,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         exclude = ('slug', 'final_price', 'available')
+
+
+class ReviewChangeStatusSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=REVIEW_STATUS_CHOICES, required=True, write_only=True)

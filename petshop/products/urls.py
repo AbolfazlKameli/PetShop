@@ -33,6 +33,11 @@ images_paths = [
 
 reviews_paths = [
     path('create/', reviews.ProductReviewCreateAPI.as_view(), name='review-create'),
+    path(
+        '<int:review_id>/change-status/',
+        reviews.ProductReviewStatusChangeAPI.as_view(),
+        name='review-status-change'
+    ),
 ]
 
 urlpatterns = [
