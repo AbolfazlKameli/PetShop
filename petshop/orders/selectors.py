@@ -16,3 +16,7 @@ def get_order_by_id(order_id: int) -> Order:
 
 def check_order_status(order: Order, statuses: list) -> bool:
     return order.status in statuses
+
+
+def nothing_orders():
+    return Order.objects.none()

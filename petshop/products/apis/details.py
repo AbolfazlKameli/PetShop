@@ -21,16 +21,16 @@ class ProductDetailCreateAPI(GenericAPIView):
 
     @extend_schema(responses={201: ResponseSerializer})
     def post(self, request, *args, **kwargs):
+        product = get_product_by_id(kwargs.get('product_id'))
+        if product is None:
+            raise CustomNotFound('Product not found.')
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            product = get_product_by_id(kwargs.get('product_id'))
-            if product is not None:
-                create_product_details(product, serializer.validated_data.get('details'))
-                return Response(
-                    data={'data': {'message': 'Detail added successfully to the product.'}},
-                    status=status.HTTP_201_CREATED
-                )
-            raise CustomNotFound('Product not found.')
+            create_product_details(product, serializer.validated_data.get('details'))
+            return Response(
+                data={'data': {'message': 'Detail added successfully to the product.'}},
+                status=status.HTTP_201_CREATED
+            )
         raise CustomBadRequest(serializer.errors)
 
 
