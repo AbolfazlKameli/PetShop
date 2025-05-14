@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomNotFound, CustomBadRequest
 from petshop.utils.permissions import IsAdminUser
-from ..selectors import get_product_by_id, get_image_by_id
+from ..selectors import get_product_by_id, get_image_by_product_and_id
 from ..serializers import ProductImageSerializer
 from ..tasks import delete_picture_from_bucket_task
 
@@ -47,7 +47,7 @@ class ProductImageUpdateAPI(GenericAPIView):
         if product is None:
             raise CustomNotFound('Product not found.')
 
-        image = get_image_by_id(self.kwargs.get('image_id'))
+        image = get_image_by_product_and_id(product, self.kwargs.get('image_id'))
         if image is None:
             raise CustomNotFound('Image not found.')
 
@@ -79,11 +79,11 @@ class ProductImageDeleteAPI(GenericAPIView):
         if product is None:
             raise CustomNotFound('Product not found.')
 
-        image = get_image_by_id(self.kwargs.get('image_id'))
+        image = get_image_by_product_and_id(product, self.kwargs.get('image_id'))
         if image is None:
             raise CustomNotFound('Image not found.')
 
-        return image
+        return image, product
 
     def delete(self, request, *args, **kwargs):
         image = self.get_object()

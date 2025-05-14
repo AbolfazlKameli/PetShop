@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomNotFound, CustomBadRequest
 from petshop.utils.permissions import IsAdminUser
-from ..selectors import get_product_by_id, get_detail_by_id
+from ..selectors import get_product_by_id, get_detail_by_product_and_id
 from ..serializers import ProductDetailsSerializer, ProductDetailCreateSerializer
 from ..services import create_product_details
 
@@ -47,7 +47,7 @@ class ProductDetailUpdateAPI(GenericAPIView):
         if product is None:
             raise CustomNotFound('Product not found.')
 
-        detail = get_detail_by_id(self.kwargs.get('detail_id'))
+        detail = get_detail_by_product_and_id(product, self.kwargs.get('detail_id'))
         if detail is None:
             raise CustomNotFound('Detail not found.')
 
@@ -79,7 +79,7 @@ class ProductDetailDeleteAPI(GenericAPIView):
         if product is None:
             raise CustomNotFound('Product not found.')
 
-        detail = get_detail_by_id(self.kwargs.get('detail_id'))
+        detail = get_detail_by_product_and_id(product, self.kwargs.get('detail_id'))
         if detail is None:
             raise CustomNotFound('Detail not found.')
 
