@@ -1,15 +1,33 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomBadRequest, CustomNotFound
 from petshop.utils.permissions import IsAdminUser
-from ..selectors import get_product_by_id, get_review_by_product_and_id
+from ..selectors import get_product_by_id, get_review_by_product_and_id, get_reviews_by_product
 from ..serializers import ProductReviewSerializer, ReviewChangeStatusSerializer
 from ..services import change_review_status
+
+
+@extend_schema(tags=['Product Reviews'])
+class ProductReviewsListAPI(ListAPIView):
+    """
+    API for listing all Reviews. Accessible only to admins.
+    """
+    serializer_class = ProductReviewSerializer
+    permission_classes = (IsAdminUser,)
+    filterset_fields = ('rate', 'status')
+    search_fields = ('body',)
+
+    def get_queryset(self):
+        product = get_product_by_id(self.kwargs.get('product_id'))
+        if product is None:
+            raise CustomNotFound('Product not found.')
+
+        return get_reviews_by_product(product)
 
 
 @extend_schema(tags=['Product Reviews'])

@@ -36,3 +36,7 @@ def get_approved_reviews(product: Product) -> list[ProductReview]:
 
 def get_review_by_product_and_id(product: Product, review_id: int) -> ProductReview | None:
     return product.reviews.filter(id=review_id).first()
+
+
+def get_reviews_by_product(product: Product) -> list[ProductReview]:
+    return product.reviews.all()
