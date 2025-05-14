@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomBadRequest, CustomNotFound
 from petshop.utils.permissions import IsAdminUser
-from ..selectors import get_product_by_id, get_review_by_product_and_id, get_reviews_by_product
+from ..selectors import get_product_by_id, get_review_by_product_and_id, get_reviews_by_product, nothing_review
 from ..serializers import ProductReviewSerializer, ReviewChangeStatusSerializer
 from ..services import change_review_status
 
@@ -23,6 +23,9 @@ class ProductReviewsListAPI(ListAPIView):
     search_fields = ('body',)
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return nothing_review()
+
         product = get_product_by_id(self.kwargs.get('product_id'))
         if product is None:
             raise CustomNotFound('Product not found.')

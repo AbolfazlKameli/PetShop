@@ -8,8 +8,7 @@ from petshop.utils.doc_serializers import ResponseSerializer
 from petshop.utils.exceptions import CustomBadRequest, CustomNotFound
 from petshop.utils.permissions import IsOwnerOrAdminUser, IsAdminUser
 from .choices import ORDER_STATUS_PENDING
-from .models import Order
-from .selectors import get_all_orders, get_order_by_id, check_order_status
+from .selectors import get_all_orders, get_order_by_id, check_order_status, nothing_orders
 from .serializers import OrderSerializer, OrderListSerializer, OrderCreateSerializer
 from .services import create_order, cancel_order, accept_order
 
@@ -40,9 +39,9 @@ class UserOrdersListAPI(ListAPIView):
     serializer_class = OrderListSerializer
     filterset_fields = ('status',)
 
-    def get_queryset(self) -> list[Order]:
+    def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
-            return Order.objects.none()
+            return nothing_orders()
         return self.request.user.orders.all()
 
 
