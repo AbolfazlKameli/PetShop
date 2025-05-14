@@ -11,7 +11,9 @@ def get_all_products() -> list[Product]:
 
 
 def get_product_by_id(product_id: int) -> Product | None:
-    return Product.objects.filter(id=product_id).first()
+    return Product.objects.select_related('category') \
+        .prefetch_related('reviews', 'details', 'images') \
+        .filter(id=product_id).first()
 
 
 def get_detail_by_product_and_id(product: Product, detail_id: int) -> ProductDetail | None:
