@@ -11,7 +11,7 @@ class ProductImageInline(admin.TabularInline):
     model = ProductImage
 
 
-class ProductReviewInline(admin.StackedInline):
+class ProductReviewInline(admin.TabularInline):
     model = ProductReview
 
 

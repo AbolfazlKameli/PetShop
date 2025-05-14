@@ -7,7 +7,7 @@ from django.db.models import Avg
 from django.utils.text import slugify
 
 from petshop.utils.utils import BaseModel
-from .choices import REVIEW_STATUS_CHOICES, REVIEW_STATUS_PENDING
+from .choices import REVIEW_STATUS_CHOICES, REVIEW_STATUS_PENDING, REVIEW_STATUS_APPROVED
 
 User = get_user_model()
 
@@ -63,7 +63,7 @@ class Product(BaseModel):
 
     @property
     def overall_rate(self):
-        avg_rate = self.reviews.aggregate(avg=Avg('rate'))['avg']
+        avg_rate = self.reviews.filter(status=REVIEW_STATUS_APPROVED).aggregate(avg=Avg('rate'))['avg']
         return round(avg_rate, 1) if avg_rate is not None else 0
 
     def save(self, *args, **kwargs):
