@@ -11,6 +11,7 @@ from ..serializers import ProductDetailsSerializer, ProductDetailCreateSerialize
 from ..services import create_product_details
 
 
+@extend_schema(tags=['Product Details'])
 class ProductDetailCreateAPI(GenericAPIView):
     """
     API for creating product details. Accessible only to the admins.
@@ -33,6 +34,7 @@ class ProductDetailCreateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Product Details'])
 class ProductDetailUpdateAPI(GenericAPIView):
     """
     API for updating product details. Accessible only to the amdins.
@@ -64,6 +66,7 @@ class ProductDetailUpdateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Product Details'])
 class ProductDetailDeleteAPI(GenericAPIView):
     """
     API for deleting product details. Accessible only to the admins.

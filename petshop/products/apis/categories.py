@@ -11,6 +11,7 @@ from ..selectors import get_all_categories
 from ..serializers import ProductCategorySerializer
 
 
+@extend_schema(tags=['Product Categories'])
 class ProductCategoriesListAPI(ListAPIView):
     """
     API for listing Categories. Accessible to all users.
@@ -21,6 +22,7 @@ class ProductCategoriesListAPI(ListAPIView):
     search_fields = ('title',)
 
 
+@extend_schema(tags=['Product Categories'])
 class ProductCategoryCreateAPI(GenericAPIView):
     """
     API for creating Categories. Accessible only to the admins.
@@ -40,6 +42,7 @@ class ProductCategoryCreateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Product Categories'])
 class ProductCategoryUpdateAPI(GenericAPIView):
     """
     API for updating Categories. Accessible only to the admins.
@@ -63,6 +66,7 @@ class ProductCategoryUpdateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Product Categories'])
 class ProductCategoryDeleteAPI(GenericAPIView):
     """
     API for deleting Categories. Accessible only to the admins.

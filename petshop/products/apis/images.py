@@ -11,6 +11,7 @@ from ..serializers import ProductImageSerializer
 from ..tasks import delete_picture_from_bucket_task
 
 
+@extend_schema(tags=['Product Images'])
 class ProductImageCreateAPI(GenericAPIView):
     """
     API for creating product images. Accessible only to the admins.
@@ -33,6 +34,7 @@ class ProductImageCreateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Product Images'])
 class ProductImageUpdateAPI(GenericAPIView):
     """
     API for updating product images. Accessible only th admins.
@@ -64,6 +66,7 @@ class ProductImageUpdateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Product Images'])
 class ProductImageDeleteAPI(GenericAPIView):
     """
     API for deleting product images. Accessible only to the admins.

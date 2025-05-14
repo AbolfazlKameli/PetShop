@@ -19,7 +19,7 @@ from ..services import register, generate_otp_code, activate_user
 from ..tasks import send_email_task, send_sms_task
 
 
-@extend_schema(responses={200: TokenResponseSerializer})
+@extend_schema(responses={200: TokenResponseSerializer}, tags=['Auth'])
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
     Custom API for obtaining JWT tokens, with a limit of five requests per hour for each IP.
@@ -27,6 +27,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
+@extend_schema(tags=['Auth'])
 class UserRegisterAPI(GenericAPIView):
     """
     API for user registration, accessible only to non-authenticated users,
@@ -54,6 +55,7 @@ class UserRegisterAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Auth'])
 class UserVerificationAPI(GenericAPIView):
     """
     API for verifying user registration, accessible only to non-authenticated users,
@@ -85,6 +87,7 @@ class UserVerificationAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Auth'])
 class ResendVerificationEmailAPI(GenericAPIView):
     """
     API for resending a verification email, accessible only to non-authenticated users,
@@ -116,6 +119,7 @@ class ResendVerificationEmailAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Auth'])
 class ResendVerificationSMSAPI(GenericAPIView):
     """
     API for resending a verification SMS, accessible only to non-authenticated users,

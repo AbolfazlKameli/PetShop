@@ -12,6 +12,7 @@ from ..selectors import get_all_addresses, get_user_addresses
 from ..serializers import AddressSerializer
 
 
+@extend_schema(tags=['Addresses'])
 class UserAddressesListAPI(ListAPIView):
     """
     API for listing authenticated users addresses. Accessible only to the uesr themselves.
@@ -26,6 +27,7 @@ class UserAddressesListAPI(ListAPIView):
         return get_user_addresses(owner=self.request.user)
 
 
+@extend_schema(tags=['Addresses'])
 class AddressCreateAPI(GenericAPIView):
     """
     API for creating addresses for the authenticated user. Accessible only to the user themselves.
@@ -45,6 +47,7 @@ class AddressCreateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Addresses'])
 class AddressUpdateAPI(GenericAPIView):
     """
     API for updating addresses for the authenticated user. Accessible only to the user themselves.
@@ -67,6 +70,7 @@ class AddressUpdateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Addresses'])
 class AddressDeleteAPI(GenericAPIView):
     """
     API for deleting addresses for the authenticated user. Accessible only to the user themselves.
