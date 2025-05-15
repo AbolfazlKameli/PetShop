@@ -12,4 +12,5 @@ urlpatterns = [
     path('products/', include('petshop.products.urls', namespace='products')),
     path('orders/', include('petshop.orders.urls', namespace='orders')),
     path('coupons/', include('petshop.coupons.urls', namespace='coupons')),
+    path('articles/', include('petshop.articles.urls', namespace='articles')),
 ]
