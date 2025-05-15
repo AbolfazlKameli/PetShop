@@ -54,6 +54,13 @@ def activate_user(user: User) -> User:
     return user
 
 
+def deactivate_user(user: User) -> User:
+    user.is_active = False
+    user.full_clean()
+    user.save()
+    return user
+
+
 def change_user_password(user: User, password: str) -> User:
     user.set_password(password)
     user.full_clean()

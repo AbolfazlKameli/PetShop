@@ -6,16 +6,17 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
 from petshop.utils.exceptions import CustomNotFound, CustomBadRequest
-from petshop.utils.permissions import NotAuthenticatedUser
-from ..selectors import get_user_by_phone_number, get_user_by_email
+from petshop.utils.permissions import NotAuthenticatedUser, IsAdminUser
+from ..selectors import get_user_by_phone_number, get_user_by_email, get_all_users
 from ..serializers import (
     UserRegisterSerializer,
     UserVerificationSerializer,
     ResendVerificationEmailSerializer,
     ResendVerificationSMSSerializer,
-    MyTokenObtainPairSerializer
+    MyTokenObtainPairSerializer,
+    UserSerializer
 )
-from ..services import register, generate_otp_code, activate_user
+from ..services import register, generate_otp_code, activate_user, deactivate_user
 from ..tasks import send_email_task, send_sms_task
 
 
@@ -153,3 +154,22 @@ class ResendVerificationSMSAPI(GenericAPIView):
                 status=status.HTTP_202_ACCEPTED
             )
         raise CustomBadRequest('This account already is active.')
+
+
+@extend_schema(tags=['Auth'])
+class BanUserAPI(GenericAPIView):
+    """
+    API for banning Users. Accessible only to the admins.
+    """
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminUser,)
+    queryset = get_all_users()
+    lookup_url_kwarg = 'user_id'
+
+    def get(self, request, *args, **kwargs):
+        user = self.get_object()
+        deactivate_user(user=user)
+        return Response(
+            data={'data': {'message': 'User banned successfully.'}},
+            status=status.HTTP_200_OK
+        )

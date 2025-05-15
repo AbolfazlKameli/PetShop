@@ -1,5 +1,4 @@
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenRefreshView
 
 from .apis import auth, user, address
 
@@ -30,6 +29,7 @@ urlpatterns = [
     path('refresh/', auth.CustomTokenRefreshAPI.as_view(), name='token_refresh'),
     path('register/', auth.UserRegisterAPI.as_view(), name='user-register'),
     path('verify/', auth.UserVerificationAPI.as_view(), name='user-verify'),
+    path('<int:user_id>/ban/', auth.BanUserAPI.as_view(), name='user-ban'),
     path('resend-verification-email/', auth.ResendVerificationEmailAPI.as_view(), name='resend-verification-email'),
     path('resend-verification-sms/', auth.ResendVerificationSMSAPI.as_view(), name='resend-verification-sms'),
     path('password/', include(password)),
