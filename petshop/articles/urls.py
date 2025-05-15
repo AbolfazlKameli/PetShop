@@ -7,6 +7,7 @@ app_name = 'articles'
 categories_paths = [
     path('', categories.ArticleCategoriesListAPI.as_view(), name='categories-list'),
     path('create/', categories.ArticleCategoryCreateAPI.as_view(), name='category-create'),
+    path('<int:category_id>/update/', categories.ArticleCategoryUpdateAPI.as_view(), name='category-update'),
 ]
 
 urlpatterns = [
