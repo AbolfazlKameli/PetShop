@@ -15,3 +15,17 @@ class ArticleCategory(models.Model):
     class Meta:
         ordering = ('-title',)
         verbose_name_plural = 'Categories'
+
+
+class Article(BaseModel):
+    category = models.ForeignKey(ArticleCategory, on_delete=models.CASCADE, related_name='articles')
+    title = models.CharField(max_length=235)
+    slug = models.SlugField(max_length=255, allow_unicode=True)
+    text = models.TextField()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ('-updated_date',)
