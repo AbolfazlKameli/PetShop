@@ -50,8 +50,7 @@ class ProductCategoryUpdateAPI(GenericAPIView):
     serializer_class = ProductCategorySerializer
     queryset = get_all_categories()
     permission_classes = (IsAdminUser,)
-    lookup_field = 'slug'
-    lookup_url_kwarg = 'category_slug'
+    lookup_url_kwarg = 'category_id'
 
     @extend_schema(responses={200: ResponseSerializer})
     def put(self, request, *args, **kwargs):
@@ -74,8 +73,7 @@ class ProductCategoryDeleteAPI(GenericAPIView):
     serializer_class = ProductCategorySerializer
     queryset = get_all_categories()
     permission_classes = (IsAdminUser,)
-    lookup_field = 'slug'
-    lookup_url_kwarg = 'category_slug'
+    lookup_url_kwarg = 'category_id'
 
     def delete(self, request, *args, **kwargs):
         category = self.get_object()

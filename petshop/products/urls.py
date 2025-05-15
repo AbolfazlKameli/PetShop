@@ -7,16 +7,8 @@ app_name = 'products'
 categories_paths = [
     path('', categories.ProductCategoriesListAPI.as_view(), name='categories-list'),
     path('create/', categories.ProductCategoryCreateAPI.as_view(), name='category-create'),
-    re_path(
-        r'(?P<category_slug>[-\w]+)/update/',
-        categories.ProductCategoryUpdateAPI.as_view(),
-        name='category-update'
-    ),
-    re_path(
-        r'(?P<category_slug>[-\w]+)/delete/',
-        categories.ProductCategoryDeleteAPI.as_view(),
-        name='category-delete'
-    ),
+    path('<int:category_id>/update/', categories.ProductCategoryUpdateAPI.as_view(), name='category-update'),
+    path('<int:category_id>/delete/', categories.ProductCategoryDeleteAPI.as_view(), name='category-delete')
 ]
 
 details_paths = [
