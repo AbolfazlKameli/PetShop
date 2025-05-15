@@ -26,6 +26,6 @@ class ArticleAdmin(admin.ModelAdmin):
 
 @admin.register(ArticleReview)
 class ProductReviewModelAdmin(admin.ModelAdmin):
-    list_display = ('article__title', 'owner__username', 'status', 'rate')
-    list_filter = ('status', 'rate')
+    list_display = ('article__title', 'owner__username', 'status',)
+    list_filter = ('status',)
     search_fields = ('body', 'owner__username')
