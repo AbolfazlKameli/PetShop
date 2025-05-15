@@ -54,8 +54,8 @@ class ArticleCategoryUpdateAPI(GenericAPIView):
 
     @extend_schema(responses={200: ResponseSerializer})
     def put(self, request, *args, **kwargs):
-        review = self.get_object()
-        serializer = self.serializer_class(data=request.data, instance=review)
+        category = self.get_object()
+        serializer = self.serializer_class(data=request.data, instance=category)
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -63,3 +63,21 @@ class ArticleCategoryUpdateAPI(GenericAPIView):
                 status=status.HTTP_200_OK
             )
         raise CustomBadRequest(serializer.errors)
+
+
+@extend_schema(tags=['Article Categories'])
+class ArticleCategoryDeleteAPI(GenericAPIView):
+    """
+    API for deleting Categories. Accessible only to the admins.
+    """
+    serializer_class = ArticleCategorySerializer
+    permission_classes = (IsAdminUser,)
+    lookup_url_kwarg = 'category_id'
+    queryset = get_all_categories()
+
+    def delete(self, request, *args, **kwargs):
+        category = self.get_object()
+        category.delete()
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
