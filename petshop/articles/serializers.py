@@ -17,4 +17,4 @@ class ArticlesListSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = '__all__'
+        exclude = ('slug',)
