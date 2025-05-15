@@ -78,3 +78,20 @@ class ArticleUpdateAPI(GenericAPIView):
                 status=status.HTTP_200_OK
             )
         raise CustomBadRequest(serializer.errors)
+
+
+class ArticleDeleteAPI(GenericAPIView):
+    """
+    API for deleting Articles. Accessible only to the admins.
+    """
+    serializer_class = ArticleSerializer
+    permission_classes = (IsAdminUser,)
+    queryset = get_all_articles()
+    lookup_url_kwarg = 'article_id'
+
+    def delete(self, request, *args, **kwargs):
+        article = self.get_object()
+        article.delete()
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
+        )
