@@ -56,3 +56,25 @@ class ArticleCreateAPI(GenericAPIView):
                 status=status.HTTP_201_CREATED
             )
         raise CustomBadRequest(serializer.errors)
+
+
+class ArticleUpdateAPI(GenericAPIView):
+    """
+    API for updating Articles. Accessible only to the admins.
+    """
+    serializer_class = ArticleSerializer
+    permission_classes = (IsAdminUser,)
+    queryset = get_all_articles()
+    lookup_url_kwarg = 'article_id'
+
+    @extend_schema(responses={200: ResponseSerializer})
+    def put(self, request, *args, **kwargs):
+        article = self.get_object()
+        serializer = self.serializer_class(data=request.data, instance=article)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                data={'data': {'message': 'Article updated successfully.'}},
+                status=status.HTTP_200_OK
+            )
+        raise CustomBadRequest(serializer.errors)
