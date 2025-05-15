@@ -1,9 +1,13 @@
-from django.urls import path
+from django.urls import path, include
 
-from . import views
+from .apis import categories
 
 app_name = 'articles'
 
-urlpatterns = [
+categories_paths = [
+    path('', categories.ArticleCategoriesListAPI.as_view(), name='categories-list'),
+]
 
+urlpatterns = [
+    path('categories/', include(categories_paths)),
 ]
