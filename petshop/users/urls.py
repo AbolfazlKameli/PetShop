@@ -26,8 +26,8 @@ addresses = [
 
 urlpatterns = [
     path('', user.UsersListAPI.as_view(), name='users-list'),
-    path('login/', auth.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('login/', auth.CustomTokenObtainPairAPI.as_view(), name='token_obtain_pair'),
+    path('refresh/', auth.CustomTokenRefreshAPI.as_view(), name='token_refresh'),
     path('register/', auth.UserRegisterAPI.as_view(), name='user-register'),
     path('verify/', auth.UserVerificationAPI.as_view(), name='user-verify'),
     path('resend-verification-email/', auth.ResendVerificationEmailAPI.as_view(), name='resend-verification-email'),

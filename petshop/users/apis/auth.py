@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from petshop.utils.doc_serializers import TokenResponseSerializer, ResponseSerializer
 from petshop.utils.exceptions import CustomNotFound, CustomBadRequest
@@ -19,8 +19,15 @@ from ..services import register, generate_otp_code, activate_user
 from ..tasks import send_email_task, send_sms_task
 
 
+@extend_schema(tags=['Auth'])
+class CustomTokenRefreshAPI(TokenRefreshView):
+    """
+    Custom API for refreshing JWT tokens.
+    """
+
+
 @extend_schema(responses={200: TokenResponseSerializer}, tags=['Auth'])
-class CustomTokenObtainPairView(TokenObtainPairView):
+class CustomTokenObtainPairAPI(TokenObtainPairView):
     """
     Custom API for obtaining JWT tokens, with a limit of five requests per hour for each IP.
     """

@@ -12,6 +12,7 @@ from .serializers import CouponSerializer, CouponApplySerializer, CouponDiscardS
 from .services import discard_coupon, apply_coupon
 
 
+@extend_schema(tags=['Coupons'])
 class CouponsListAPI(ListAPIView):
     """
     API for listing Coupons. Accessible only to the admins.
@@ -22,6 +23,7 @@ class CouponsListAPI(ListAPIView):
     filterset_class = CouponFilter
 
 
+@extend_schema(tags=['Coupons'])
 class CouponRetrieveAPI(GenericAPIView):
     """
     API for retrieving Coupon objects. Accessible only to the admins.
@@ -40,6 +42,7 @@ class CouponRetrieveAPI(GenericAPIView):
         )
 
 
+@extend_schema(tags=['Coupons'])
 class CouponCreateAPI(GenericAPIView):
     """
     API for creating Coupons. Accessible only to admins.
@@ -59,6 +62,7 @@ class CouponCreateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Coupons'])
 class CouponUpdateAPI(GenericAPIView):
     """
     API for updating valid Coupons. Accessible only to the admins.
@@ -81,6 +85,7 @@ class CouponUpdateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Coupons'])
 class CouponDeleteAPI(GenericAPIView):
     """
     API for deleting Coupons. Accessible only to the admins.
@@ -99,6 +104,7 @@ class CouponDeleteAPI(GenericAPIView):
         )
 
 
+@extend_schema(tags=['Coupons'])
 class CouponApplyAPI(GenericAPIView):
     """
     API for applying Coupons to orders. Accessible to orders owners or admins.
@@ -123,6 +129,7 @@ class CouponApplyAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Coupons'])
 class CouponDiscardAPI(GenericAPIView):
     """
     API for discarding Coupons. Accessible to orders owners and admins.

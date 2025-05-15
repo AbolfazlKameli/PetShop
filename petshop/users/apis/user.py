@@ -18,6 +18,7 @@ from ..services import generate_otp_code, change_user_password, update_user
 from ..tasks import send_email_task, send_sms_task
 
 
+@extend_schema(tags=['Users'])
 class UsersListAPI(ListAPIView):
     """
     API for listing all users, accessible only to admin users.
@@ -29,6 +30,7 @@ class UsersListAPI(ListAPIView):
     search_fields = ['email', 'username', 'phone_number', 'first_name', 'last_name']
 
 
+@extend_schema(tags=['Users'])
 class ChangePasswordAPI(GenericAPIView):
     """
     API for changing a user's password, accessible only to the user.
@@ -48,6 +50,7 @@ class ChangePasswordAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Users'])
 class SetPasswordAPI(GenericAPIView):
     """
     API for setting a user's password during the reset password process, accessible to all users.
@@ -71,6 +74,7 @@ class SetPasswordAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Users'])
 class ResetPasswordAPI(GenericAPIView):
     """
     API for initiating the password reset process by sending a reset link to the user's email, accessible to all users.
@@ -100,6 +104,7 @@ class ResetPasswordAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Users'])
 class UserProfileRetrieveAPI(GenericAPIView):
     """
     API for retrieving the authenticated user's profile information.
@@ -120,6 +125,7 @@ class UserProfileRetrieveAPI(GenericAPIView):
         )
 
 
+@extend_schema(tags=['Users'])
 class UserProfileUpdateAPI(GenericAPIView):
     """
     API for updating the authenticated user's profile.
@@ -165,6 +171,7 @@ class UserProfileUpdateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Users'])
 class DeleteUserAccountAPI(GenericAPIView):
     """
     API for deleting the authenticated user's account. Accessible to the user themselves.

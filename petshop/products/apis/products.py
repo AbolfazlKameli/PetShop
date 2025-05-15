@@ -13,6 +13,7 @@ from ..serializers import ProductListSerializer, ProductSerializer, ProductWrite
 from ..services import create_product
 
 
+@extend_schema(tags=['Products'])
 class ProductsListAPI(ListAPIView):
     """
     API for listing products. Accessible to all users.
@@ -25,6 +26,7 @@ class ProductsListAPI(ListAPIView):
     search_fields = ('title', 'description')
 
 
+@extend_schema(tags=['Products'])
 class ProductRetrieveAPI(GenericAPIView):
     """
     API for retrieving products by their IDs. Accessible to all users.
@@ -44,6 +46,7 @@ class ProductRetrieveAPI(GenericAPIView):
         )
 
 
+@extend_schema(tags=['Products'])
 class ProductCreateAPI(GenericAPIView):
     """
     API for creating products. Accessible only to the admins.
@@ -64,6 +67,7 @@ class ProductCreateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Products'])
 class ProductUpdateAPI(GenericAPIView):
     """
     API for updating products. Accessible only to the admins.
@@ -85,6 +89,7 @@ class ProductUpdateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Products'])
 class ProductDeleteAPI(GenericAPIView):
     """
     API for deleting products. Accessible only to the admins.

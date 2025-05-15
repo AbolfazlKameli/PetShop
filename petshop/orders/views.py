@@ -13,6 +13,7 @@ from .serializers import OrderSerializer, OrderListSerializer, OrderCreateSerial
 from .services import create_order, cancel_order, accept_order
 
 
+@extend_schema(tags=['Orders'])
 class OrderRetrieveAPI(GenericAPIView):
     """
     API for retrieving authenticated user orders. Accessible only to the users themselves or admins.
@@ -31,6 +32,7 @@ class OrderRetrieveAPI(GenericAPIView):
         )
 
 
+@extend_schema(tags=['Orders'])
 class UserOrdersListAPI(ListAPIView):
     """
     API for listing authenticated user orders. Accessible only to the users themselves or admins.
@@ -45,6 +47,7 @@ class UserOrdersListAPI(ListAPIView):
         return self.request.user.orders.all()
 
 
+@extend_schema(tags=['Orders'])
 class OrdersListAPI(ListAPIView):
     """
     API for listing all orders. Accessible only to the admins.
@@ -55,6 +58,7 @@ class OrdersListAPI(ListAPIView):
     filterset_fields = ('status',)
 
 
+@extend_schema(tags=['Orders'])
 class OrderCreateAPI(GenericAPIView):
     """
     API for creating an order for authenticated user. Accessibleo only to authenticated users.
@@ -74,6 +78,7 @@ class OrderCreateAPI(GenericAPIView):
         raise CustomBadRequest(serializer.errors)
 
 
+@extend_schema(tags=['Orders'])
 class OrderCancelAPI(GenericAPIView):
     """
     API for canceling an order. Accessible only to order owner or admins.
@@ -102,6 +107,7 @@ class OrderCancelAPI(GenericAPIView):
         )
 
 
+@extend_schema(tags=['Orders'])
 class OrderAcceptAPI(GenericAPIView):
     """
     API for accepting orders. Accessible only to admins.
