@@ -1,0 +1,72 @@
+services:
+  redis:
+    container_name: pethsop_redis
+    image: docker.arvancloud.ir/redis:7.4.1
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - main_network
+
+  db:
+    container_name: petshop_database
+    image: docker.arvancloud.ir/postgres:16
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - main_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  petshop:
+    container_name: petshop
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: petshop:1.0.0
+    volumes:
+      - petshop_data:/PetShop
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - main_network
+    depends_on:
+      redis:
+        condition: service_started
+      db:
+        condition: service_healthy
+
+  celery:
+    container_name: celery_worker
+    image: petshop:1.0.0
+    entrypoint: celery -A config worker -l INFO
+    volumes:
+      - petshop_data:/PetShop
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - petshop
+    restart: always
+    networks:
+      - main_network
+    environment:
+      - C_FORCE_ROOT="true"
+
+volumes:
+  petshop_data:
+  redis_data:
+  postgres_data:
+
+networks:
+  main_network:
+    driver: bridge
