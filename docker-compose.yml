@@ -1,6 +1,6 @@
 services:
   redis:
-    container_name: pethsop_redis
+    container_name: petshop_redis
     image: docker.arvancloud.ir/redis:7.4.1
     restart: always
     volumes:
