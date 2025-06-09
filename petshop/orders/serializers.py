@@ -4,6 +4,11 @@ from .models import Order, OrderItem
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    total_price = serializers.SerializerMethodField()
+
+    def get_total_price(self, obj) -> int:
+        return obj.get_total_price()
+
     class Meta:
         model = OrderItem
         exclude = ('order',)
