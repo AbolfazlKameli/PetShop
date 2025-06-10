@@ -6,8 +6,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     *default_headers,
-    'content-type',
-    'authorization',
 ]
 
 BASE_BACKEND_URL = config("DJANGO_BASE_BACKEND_URL", default="http://localhost:8000")
