@@ -5,7 +5,7 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1').split(',')
 
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS').split(',')
+CORS_ALLOWED_ORIGINS = config('DJANGO_CORS_ORIGIN_WHITELIST').split(',')
 
 DATABASES = {
     'default': {
