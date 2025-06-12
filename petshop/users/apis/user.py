@@ -63,14 +63,14 @@ class SetPasswordAPI(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             user = get_user_by_email(serializer.validated_data.get('email'))
-            if user is None:
-                raise CustomNotFound('User with this email not found.')
-
-            change_user_password(user, serializer.validated_data.get('confirm_password'))
-            return Response(
+            response = Response(
                 data={'data': {'message': 'Password Set successfully.'}},
                 status=status.HTTP_200_OK
             )
+            if user is None:
+                return response
+            change_user_password(user, serializer.validated_data.get('confirm_password'))
+            return response
         raise CustomBadRequest(serializer.errors)
 
 
@@ -87,9 +87,12 @@ class ResetPasswordAPI(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             user = get_user_by_email(serializer.validated_data.get('email'))
+            response = Response(
+                data={'data': {'message': 'We have sent a verification code to your email'}},
+                status=status.HTTP_202_ACCEPTED
+            )
             if user is None:
-                raise CustomNotFound('User with this email not found.')
-
+                return response
             otp_code = generate_otp_code(email=user.email)
             content = f'Reset password code: \n{otp_code}'
             send_email_task.delay(
@@ -97,10 +100,7 @@ class ResetPasswordAPI(GenericAPIView):
                 content=content,
                 subject='PetShop'
             )
-            return Response(
-                data={'data': {'message': 'We have sent a verification code to your email'}},
-                status=status.HTTP_202_ACCEPTED
-            )
+            return response
         raise CustomBadRequest(serializer.errors)
 
 
