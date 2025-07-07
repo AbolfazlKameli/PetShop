@@ -89,7 +89,7 @@ class OrderCancelAPI(GenericAPIView):
     allowed_statuses = [ORDER_STATUS_PENDING]
 
     def get_object(self):
-        order = get_order_by_id(self.kwargs.get('order_id'))
+        order = get_order_by_id(self.kwargs.get('order_id'), for_update=True)
         if order is None or not check_order_status(order, self.allowed_statuses):
             raise CustomNotFound('Could`nt find any pending order with this id.')
 
@@ -118,7 +118,7 @@ class OrderAcceptAPI(GenericAPIView):
     allowed_statuses = [ORDER_STATUS_PENDING]
 
     def get_object(self):
-        order = get_order_by_id(self.kwargs.get('order_id'))
+        order = get_order_by_id(self.kwargs.get('order_id'), for_update=True)
         if order is None or not check_order_status(order, self.allowed_statuses):
             raise CustomNotFound('Could`nt find any pending order with this id.')
 
