@@ -16,6 +16,10 @@ def get_product_by_id(product_id: int) -> Product | None:
         .filter(id=product_id).first()
 
 
+def get_products_for_update_by_id(ids: list[int]) -> dict[int, Product]:
+    return Product.objects.filter(id__in=ids).select_for_update().in_bulk()
+
+
 def get_detail_by_product_and_id(product: Product, detail_id: int) -> ProductDetail | None:
     return product.details.filter(id=detail_id).first()
 

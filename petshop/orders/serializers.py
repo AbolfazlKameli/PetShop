@@ -44,28 +44,31 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         fields = ('items',)
 
     def validate(self, attrs):
-        items = attrs.get('items')[0]
-        product = items.get('product')
-        quantity = items.get('quantity')
+        errors = []
+        for index, item in enumerate(attrs.get('items', [])):
+            item_errors = {}
+            if not item:
+                errors.append({index: 'There is no items in data.'})
+                continue
 
-        if not items:
-            raise serializers.ValidationError({'items': 'There is no items in data.'})
+            product = item.get('product')
+            quantity = item.get('quantity')
 
-        if not product.available:
-            raise serializers.ValidationError({'items': [{'product': ['This product is out of stock.']}]})
+            if not product.available:
+                item_errors['product'] = 'This product is out of stock.'
 
-        if product.quantity < quantity or quantity <= 0:
-            raise serializers.ValidationError({
-                'items': [
-                    {'quantity': ['The quantity you requested is more than what is currently available in stock.']}
-                ]
-            })
+            if quantity is None or quantity <= 0:
+                item_errors['quantity'] = 'The quantity should be greater than zero.'
 
-        if quantity > 100:
-            raise serializers.ValidationError({
-                'items': [
-                    {'quantity': ['You can`t order more than 100 products.']}
-                ]
-            })
+            if product.quantity < quantity:
+                item_errors['quantity'] = 'The quantity you have entered is less than the product quantity.'
+
+            if quantity > 100:
+                item_errors['quantity'] = 'The quantity you have entered is greater than 100.'
+
+            if item_errors:
+                errors.append({index: item_errors})
+        if errors:
+            raise serializers.ValidationError(errors)
 
         return attrs

@@ -7,10 +7,15 @@ def get_all_orders() -> list[Order]:
 
 
 def get_pending_orders() -> list[Order]:
-    return Order.objects.select_related('coupon').prefetch_related('coupon').filter(status=ORDER_STATUS_PENDING)
+    return (Order.objects.select_related('coupon')
+            .prefetch_related('coupon')
+            .select_for_update()
+            .filter(status=ORDER_STATUS_PENDING))
 
 
-def get_order_by_id(order_id: int) -> Order:
+def get_order_by_id(order_id: int, for_update: bool = False) -> Order:
+    if for_update:
+        return Order.objects.prefetch_related('items').filter(id=order_id).select_for_update().first()
     return Order.objects.prefetch_related('items').filter(id=order_id).first()
 
 

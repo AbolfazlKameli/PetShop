@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from petshop.products.models import Product
+from petshop.products.selectors import get_products_for_update_by_id
 from .choices import ORDER_STATUS_CANCELLED, ORDER_STATUS_SUCCESS
 from .models import Order, OrderItem
 
@@ -12,12 +13,16 @@ User = get_user_model()
 def create_order(owner: User, data: list[dict[str, int | Product]]):
     order = Order.objects.create(owner=owner)
 
+    product_ids = [item['product'].id for item in data]
+    products = get_products_for_update_by_id(product_ids)
+
     products_to_update = []
     items = []
 
     for item in data:
-        product = item.get('product')
+        product_id = item.get('product').id
         quantity = item.get('quantity')
+        product = products[product_id]
 
         product.quantity -= quantity
         products_to_update.append(product)
