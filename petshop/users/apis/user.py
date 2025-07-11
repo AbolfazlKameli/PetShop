@@ -93,7 +93,7 @@ class ResetPasswordAPI(GenericAPIView):
             )
             if user is None:
                 return response
-            otp_code = generate_otp_code(email=user.email)
+            otp_code = generate_otp_code(email=user.email, action='reset_password')
             content = f'Reset password code: \n{otp_code}'
             send_email_task.delay(
                 email=user.email,
@@ -151,7 +151,7 @@ class UserProfileUpdateAPI(GenericAPIView):
             message, state = update_user(user, serializer.validated_data)
 
             if state == 1:
-                otp_code = generate_otp_code(email=user.email)
+                otp_code = generate_otp_code(email=user.email, action='verify')
                 content = f'Your verification code: \n{otp_code}'
                 send_email_task.delay(
                     email=user.email,
@@ -160,7 +160,7 @@ class UserProfileUpdateAPI(GenericAPIView):
                 )
 
             elif state == 2:
-                otp_code = generate_otp_code(phone_number=user.phone_number)
+                otp_code = generate_otp_code(phone_number=user.phone_number, action='verify')
                 content = f'Your verification code: \n{otp_code}'
                 send_sms_task.delay(phone_number=user.phone_number, content=content)
 

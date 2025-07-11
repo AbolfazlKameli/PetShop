@@ -1,5 +1,6 @@
 import hashlib
 from random import randint
+from typing import Literal
 
 from decouple import config
 from django.core.cache import cache
@@ -12,32 +13,43 @@ def hash_key(cache_key: str) -> str:
     return hashlib.sha256(cache_key.encode()).hexdigest()
 
 
-def generate_otp_code(*, email: str | None = None, phone_number: str | None = None) -> str:
+def generate_otp_code(
+        *,
+        email: str | None = None,
+        phone_number: str | None = None,
+        action: Literal['verify', 'reset_password']
+) -> str:
     identifier = email or phone_number
     if not identifier:
         raise ValueError('Email or Phone number must be provided.')
 
-    cache_key = f'otp_code_{hash_key(identifier)}'
+    cache_key = f'otp_code_{hash_key(identifier)}_{action}'
 
     while True:
         otp_code: str = str(randint(10_000, 99_999))
-        if not cache.get(f'otp_used_{otp_code}'):
+        if not cache.get(f'otp_used_{otp_code}_{action}'):
             cache.set(cache_key, otp_code, 300)
-            cache.set(f'otp_used_{otp_code}', True, timeout=300)
+            cache.set(f'otp_used_{otp_code}_{action}', True, timeout=300)
             return otp_code
 
 
-def check_otp_code(*, otp_code: str, email: str | None = None, phone_number: str | None = None) -> bool:
+def check_otp_code(
+        *,
+        otp_code: str,
+        email: str | None = None,
+        phone_number: str | None = None,
+        action: Literal['verify', 'reset_password']
+) -> bool:
     identifier = email or phone_number
     if not identifier:
         raise ValueError('Email or Phone number must be provided.')
 
-    cache_key = f'otp_code_{hash_key(identifier)}'
+    cache_key = f'otp_code_{hash_key(identifier)}_{action}'
     code = cache.get(cache_key)
 
     if code == otp_code:
         cache.delete(cache_key)
-        cache.delete(f'otp_used_{otp_code}')
+        cache.delete(f'otp_used_{otp_code}_{action}')
         return code == otp_code
     return False
 

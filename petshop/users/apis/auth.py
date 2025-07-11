@@ -49,7 +49,7 @@ class UserRegisterAPI(GenericAPIView):
         if serializer.is_valid():
             vd = serializer.validated_data
             user = register(email=vd['email'], username=vd['username'], password=vd['password'])
-            otp_code = generate_otp_code(email=user.email)
+            otp_code = generate_otp_code(email=user.email, action='verify')
             content = f'Your verification code: \n{otp_code}'
             send_email_task.delay(
                 email=user.email,
@@ -119,7 +119,7 @@ class ResendVerificationEmailAPI(GenericAPIView):
             if user.is_active:
                 raise CustomBadRequest('This account already is active.')
 
-            otp_code = generate_otp_code(email=user.email)
+            otp_code = generate_otp_code(email=user.email, action='verify')
             content = f'Your verification code: \n{otp_code}'
             send_email_task.delay(
                 email=user.email,
@@ -153,7 +153,7 @@ class ResendVerificationSMSAPI(GenericAPIView):
             if user.is_active:
                 raise CustomBadRequest('This account already is active.')
 
-            otp_code = generate_otp_code(phone_number=user.phone_number)
+            otp_code = generate_otp_code(phone_number=user.phone_number, action='verify')
             content = f'Your verification code: \n{otp_code}'
             send_sms_task.delay(phone_number=phone_number, content=content)
             return response

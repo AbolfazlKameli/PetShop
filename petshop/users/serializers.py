@@ -77,10 +77,10 @@ class UserVerificationSerializer(serializers.Serializer):
         code = attrs.get('code')
 
         if email:
-            if not check_otp_code(otp_code=code, email=email):
+            if not check_otp_code(otp_code=code, email=email, action='verify'):
                 raise serializers.ValidationError({'code': 'Code is invalid.'})
         elif phone_number:
-            if not check_otp_code(otp_code=code, phone_number=phone_number):
+            if not check_otp_code(otp_code=code, phone_number=phone_number, action='verify'):
                 raise serializers.ValidationError({'code': 'Code is invalid.'})
         else:
             raise serializers.ValidationError('Entering an email address or phone number is required.')
@@ -136,7 +136,7 @@ class SetPasswordSerializer(serializers.Serializer):
 
         email = attrs.get('email')
         code = attrs.get('code')
-        if not check_otp_code(otp_code=code, email=email):
+        if not check_otp_code(otp_code=code, email=email, action='reset_password'):
             raise serializers.ValidationError({'code': 'Code is invalid.'})
         return attrs
 
