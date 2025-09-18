@@ -23,7 +23,7 @@ authentication, task management, and cloud storage integration.
 ## 👥 Authors
 
 - [Abolfazl Kameli](https://github.com/AbolfazlKameli) (Back-end Developer)
-
+- [Hosein Parvaresh](https://github.com/HoseinParvaresh) (Front-end Developer)
 ---
 
 ## 🐳 Run with Docker
